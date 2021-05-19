@@ -15,6 +15,11 @@
  */
 package com.google.enterprise.cloudsearch.dropbox.identity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.dropbox.core.v2.DbxTeamClientV2;
+import com.google.enterprise.cloudsearch.dropbox.DropBoxClientFactory;
+import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityGroup;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityUser;
@@ -28,12 +33,17 @@ import java.util.logging.Logger;
 final class DropBoxIdentityRepository implements Repository {
   private static final Logger log = Logger.getLogger(DropBoxIdentityRepository.class.getName());
 
+  private RepositoryContext repositoryContext;
+  private DbxTeamClientV2 client;
+
   DropBoxIdentityRepository() {
   }
 
   @Override
   public void init(RepositoryContext context) throws IOException {
-    // TODO
+    repositoryContext = checkNotNull(context, "repository context can not be null");
+    DropBoxConfiguration dropBoxConfiguration = DropBoxConfiguration.fromConfiguration();
+    client = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
   }
 
   @Override

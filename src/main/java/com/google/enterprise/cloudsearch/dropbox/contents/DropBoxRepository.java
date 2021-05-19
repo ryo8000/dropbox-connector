@@ -17,7 +17,9 @@ package com.google.enterprise.cloudsearch.dropbox.contents;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.dropbox.core.v2.DbxTeamClientV2;
 import com.google.api.services.cloudsearch.v1.model.Item;
+import com.google.enterprise.cloudsearch.dropbox.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.RepositoryException;
@@ -31,12 +33,15 @@ import java.util.logging.Logger;
 final class DropBoxRepository implements Repository {
   private static final Logger log = Logger.getLogger(DropBoxRepository.class.getName());
 
+  private DbxTeamClientV2 client;
+
   DropBoxRepository() {
   }
 
   @Override
   public void init(RepositoryContext repositoryContext) throws RepositoryException {
-    // TODO
+    DropBoxConfiguration dropBoxConfiguration = DropBoxConfiguration.fromConfiguration();
+    client = DropBoxClientFactory.getTeamClien2(dropBoxConfiguration.getCredentialFile());
   }
 
   @Override
