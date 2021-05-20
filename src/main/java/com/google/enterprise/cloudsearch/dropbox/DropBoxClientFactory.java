@@ -18,7 +18,6 @@ package com.google.enterprise.cloudsearch.dropbox;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.json.JsonReader;
 import com.dropbox.core.oauth.DbxCredential;
-import com.dropbox.core.v2.DbxTeamClientV2;
 import com.google.enterprise.cloudsearch.sdk.InvalidConfigurationException;
 
 public final class DropBoxClientFactory {
@@ -27,10 +26,10 @@ public final class DropBoxClientFactory {
   private DropBoxClientFactory() {
   }
 
-  public static DbxTeamClientV2 getTeamClient(String credentialFile) {
+  public static DropBoxClient getTeamClient(String credentialFile) {
     DbxCredential credential = createCredential(credentialFile);
     DbxRequestConfig requestConfig = new DbxRequestConfig(IDENTIFIER);
-    return new DbxTeamClientV2(requestConfig, credential);
+    return new DropBoxClient(requestConfig, credential);
   }
 
   private static DbxCredential createCredential(String credentialFile) {
