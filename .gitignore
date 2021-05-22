@@ -1,5 +1,23 @@
-# Compiled class file
-*.class
+# Normal private files
+build/
+target/
+dist/
+*~
+
+# Eclipse files
+.classpath
+.project
+.settings/
+
+# IntelliJ files
+workspace/
+classes/
+
+# NetBeans files
+nbproject/
+
+# Vim
+*.swp
 
 # Log file
 *.log
