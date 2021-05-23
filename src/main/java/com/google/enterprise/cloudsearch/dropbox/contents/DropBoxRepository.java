@@ -18,9 +18,9 @@ package com.google.enterprise.cloudsearch.dropbox.contents;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.api.services.cloudsearch.v1.model.Item;
-import com.google.enterprise.cloudsearch.dropbox.DropBoxClient;
-import com.google.enterprise.cloudsearch.dropbox.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
+import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClient;
+import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.RepositoryException;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperation;

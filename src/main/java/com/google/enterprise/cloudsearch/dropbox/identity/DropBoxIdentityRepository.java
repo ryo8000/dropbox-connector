@@ -17,9 +17,9 @@ package com.google.enterprise.cloudsearch.dropbox.identity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.enterprise.cloudsearch.dropbox.DropBoxClient;
-import com.google.enterprise.cloudsearch.dropbox.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
+import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClient;
+import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityGroup;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityUser;
