@@ -5,4 +5,9 @@
     "**/.settings": true,
     "**/.factorypath": true,
   },
+  "java.format.settings.profile": "GoogleStyle",
+  "java.format.settings.url": "customized-java-google-style.xml",
+  "[java]": {
+    "editor.formatOnSave": true,
+  },
 }
