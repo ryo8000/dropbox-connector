@@ -19,11 +19,11 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxTeamClientV2;
 
-public final class DropBoxClient {
+public final class TeamClient {
 
   private final DbxTeamClientV2 client;
 
-  public DropBoxClient(DbxRequestConfig requestConfig, DbxCredential credential) {
+  public TeamClient(DbxRequestConfig requestConfig, DbxCredential credential) {
     this.client = new DbxTeamClientV2(requestConfig, credential);
   }
 }

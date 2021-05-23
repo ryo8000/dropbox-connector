@@ -26,10 +26,10 @@ public final class DropBoxClientFactory {
   private DropBoxClientFactory() {
   }
 
-  public static DropBoxClient getTeamClient(String credentialFile) {
+  public static TeamClient getTeamClient(String credentialFile) {
     DbxCredential credential = createCredential(credentialFile);
     DbxRequestConfig requestConfig = new DbxRequestConfig(IDENTIFIER);
-    return new DropBoxClient(requestConfig, credential);
+    return new TeamClient(requestConfig, credential);
   }
 
   private static DbxCredential createCredential(String credentialFile) {

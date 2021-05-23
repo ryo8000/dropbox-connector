@@ -19,8 +19,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.api.services.cloudsearch.v1.model.Item;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
-import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClient;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
+import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.RepositoryException;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperation;
@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 final class DropBoxRepository implements Repository {
   private static final Logger log = Logger.getLogger(DropBoxRepository.class.getName());
 
-  private DropBoxClient client;
+  private TeamClient teamClient;
 
   DropBoxRepository() {
   }
@@ -41,7 +41,7 @@ final class DropBoxRepository implements Repository {
   @Override
   public void init(RepositoryContext repositoryContext) throws RepositoryException {
     DropBoxConfiguration dropBoxConfiguration = DropBoxConfiguration.fromConfiguration();
-    client = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
+    teamClient = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
   }
 
   @Override

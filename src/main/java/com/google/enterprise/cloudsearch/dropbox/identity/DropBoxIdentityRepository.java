@@ -18,8 +18,8 @@ package com.google.enterprise.cloudsearch.dropbox.identity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
-import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClient;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
+import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityGroup;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityUser;
@@ -34,7 +34,7 @@ final class DropBoxIdentityRepository implements Repository {
   private static final Logger log = Logger.getLogger(DropBoxIdentityRepository.class.getName());
 
   private RepositoryContext repositoryContext;
-  private DropBoxClient client;
+  private TeamClient teamClient;
 
   DropBoxIdentityRepository() {
   }
@@ -43,7 +43,7 @@ final class DropBoxIdentityRepository implements Repository {
   public void init(RepositoryContext context) throws IOException {
     repositoryContext = checkNotNull(context, "repository context can not be null");
     DropBoxConfiguration dropBoxConfiguration = DropBoxConfiguration.fromConfiguration();
-    client = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
+    teamClient = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
   }
 
   @Override
