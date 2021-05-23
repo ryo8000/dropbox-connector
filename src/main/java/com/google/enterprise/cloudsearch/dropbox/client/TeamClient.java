@@ -15,9 +15,15 @@
  */
 package com.google.enterprise.cloudsearch.dropbox.client;
 
+import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxTeamClientV2;
+import com.dropbox.core.v2.team.MembersListResult;
+import com.dropbox.core.v2.team.TeamMemberInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TeamClient {
 
@@ -25,5 +31,25 @@ public final class TeamClient {
 
   public TeamClient(DbxRequestConfig requestConfig, DbxCredential credential) {
     this.client = new DbxTeamClientV2(requestConfig, credential);
+  }
+
+  /**
+   * Fetch members of a team.
+   *
+   * @return team members.
+   * @throws DbxException when fetching members from DropBox fails
+   */
+  public List<TeamMemberInfo> getMembers() throws DbxException {
+    MembersListResult result = client.team().membersList();
+    List<TeamMemberInfo> members = new ArrayList<>();
+
+    while (true) {
+      members.addAll(result.getMembers());
+      if (!result.getHasMore()) {
+        break;
+      }
+      result = client.team().membersListContinue(result.getCursor());
+    }
+    return members;
   }
 }

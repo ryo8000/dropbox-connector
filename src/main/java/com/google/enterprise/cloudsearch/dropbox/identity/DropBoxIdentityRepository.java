@@ -17,6 +17,8 @@ package com.google.enterprise.cloudsearch.dropbox.identity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
@@ -27,6 +29,8 @@ import com.google.enterprise.cloudsearch.sdk.identity.Repository;
 import com.google.enterprise.cloudsearch.sdk.identity.RepositoryContext;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +52,12 @@ final class DropBoxIdentityRepository implements Repository {
 
   @Override
   public CheckpointCloseableIterable<IdentityUser> listUsers(byte[] checkpoint) throws IOException {
+    List<TeamMemberInfo> members = Collections.emptyList();
+    try {
+      members = teamClient.getMembers();
+    } catch (DbxException e) {
+      throw new IOException("Failed to get members", e);
+    }
     // TODO
     return null;
   }
