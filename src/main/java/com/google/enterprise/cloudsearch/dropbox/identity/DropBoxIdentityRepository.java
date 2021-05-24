@@ -19,10 +19,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.team.TeamMemberInfo;
+import com.google.common.base.Strings;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
+import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterableImpl;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityGroup;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityUser;
 import com.google.enterprise.cloudsearch.sdk.identity.Repository;
@@ -31,8 +33,10 @@ import com.google.enterprise.cloudsearch.sdk.identity.RepositoryContext;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 final class DropBoxIdentityRepository implements Repository {
   private static final Logger log = Logger.getLogger(DropBoxIdentityRepository.class.getName());
@@ -58,8 +62,14 @@ final class DropBoxIdentityRepository implements Repository {
     } catch (DbxException e) {
       throw new IOException("Failed to get members", e);
     }
-    // TODO
-    return null;
+
+    List<IdentityUser> identityUsers = members
+        .stream()
+        .map(user -> convertToIdentityUser(user))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+    return new CheckpointCloseableIterableImpl.Builder<>(identityUsers)
+        .build();
   }
 
   @Override
@@ -71,5 +81,15 @@ final class DropBoxIdentityRepository implements Repository {
 
   @Override
   public void close() {
+  }
+
+  private IdentityUser convertToIdentityUser(TeamMemberInfo user) {
+    String googleId = user.getProfile().getEmail();
+    String externalId = user.getProfile().getTeamMemberId();
+    if (Strings.isNullOrEmpty(googleId) || Strings.isNullOrEmpty(externalId)) {
+      log.log(Level.WARNING, "Skipping invalid User: [{0}].", user);
+      return null;
+    }
+    return repositoryContext.buildIdentityUser(googleId, externalId);
   }
 }
