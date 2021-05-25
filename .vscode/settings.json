@@ -8,6 +8,8 @@
   "java.format.settings.profile": "CustomizedGoogleStyle",
   "java.format.settings.url": "customized-java-google-style.xml",
   "[java]": {
+    "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
+    "editor.formatOnType": true,
   },
 }
