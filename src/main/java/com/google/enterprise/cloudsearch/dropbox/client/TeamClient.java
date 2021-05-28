@@ -19,9 +19,10 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxTeamClientV2;
+import com.dropbox.core.v2.team.GroupsListResult;
 import com.dropbox.core.v2.team.MembersListResult;
 import com.dropbox.core.v2.team.TeamMemberInfo;
-
+import com.dropbox.core.v2.teamcommon.GroupSummary;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,5 +52,25 @@ public final class TeamClient {
       result = client.team().membersListContinue(result.getCursor());
     }
     return members;
+  }
+
+  /**
+   * Fetch groups of a team.
+   *
+   * @return Team groups.
+   * @throws DbxException when fetching groups from DropBox fails.
+   */
+  public List<GroupSummary> getGroups() throws DbxException {
+    GroupsListResult result = client.team().groupsList();
+    List<GroupSummary> groups = new ArrayList<>();
+
+    while (true) {
+      groups.addAll(result.getGroups());
+      if (!result.getHasMore()) {
+        break;
+      }
+      result = client.team().groupsListContinue(result.getCursor());
+    }
+    return groups;
   }
 }
