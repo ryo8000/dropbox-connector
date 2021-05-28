@@ -38,15 +38,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/** An Identity repository for listing Users and Groups form a repository. */
 final class DropBoxIdentityRepository implements Repository {
+  /** Log output */
   private static final Logger log = Logger.getLogger(DropBoxIdentityRepository.class.getName());
 
+  /** Injected context, provides convenience methods for building users & groups */
   private RepositoryContext repositoryContext;
+  /** {@inheritDoc} */
   private TeamClient teamClient;
 
   DropBoxIdentityRepository() {
   }
 
+  /**
+   * Initializes the repository once the SDK is initialized.
+   *
+   * @param context Injected context, contains convenience methods for building users & groups.
+   * @throws IOException if unable to initialize.
+   */
   @Override
   public void init(RepositoryContext context) throws IOException {
     repositoryContext = checkNotNull(context, "repository context can not be null");
@@ -54,6 +64,13 @@ final class DropBoxIdentityRepository implements Repository {
     teamClient = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
   }
 
+  /**
+   * Retrieves all user identity mappings for the identity source.
+   *
+   * @param checkpoint Saved state if paging over large result sets.
+   * @return Iterator of user identity mappings.
+   * @throws IOException if unable to read user identity mappings.
+   */
   @Override
   public CheckpointCloseableIterable<IdentityUser> listUsers(byte[] checkpoint) throws IOException {
     List<TeamMemberInfo> members = Collections.emptyList();
@@ -72,6 +89,13 @@ final class DropBoxIdentityRepository implements Repository {
         .build();
   }
 
+  /**
+   * Retrieves all group rosters for the identity source.
+   *
+   * @param checkpoint Saved state if paging over large result sets.
+   * @return Iterator of group rosters.
+   * @throws IOException if unable to read groups.
+   */
   @Override
   public CheckpointCloseableIterable<IdentityGroup> listGroups(byte[] checkpoint)
       throws IOException {
@@ -79,10 +103,20 @@ final class DropBoxIdentityRepository implements Repository {
     return null;
   }
 
+  /**
+   * Closes the data repository and releases resources sch as connections or executors.
+   */
   @Override
   public void close() {
   }
 
+  /**
+   * Convert a DropBox user to an identity user.
+   * If it is not possible, return {@code null}.
+   *
+   * @param user A DropBox user.
+   * @return An identity user or {@code null}.
+   */
   private IdentityUser convertToIdentityUser(TeamMemberInfo user) {
     String googleId = user.getProfile().getEmail();
     String externalId = user.getProfile().getTeamMemberId();
