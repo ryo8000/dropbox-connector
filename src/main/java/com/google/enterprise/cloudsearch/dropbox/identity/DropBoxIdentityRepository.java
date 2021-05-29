@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.team.TeamMemberInfo;
+import com.dropbox.core.v2.teamcommon.GroupSummary;
 import com.google.common.base.Strings;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
@@ -99,6 +100,13 @@ final class DropBoxIdentityRepository implements Repository {
   @Override
   public CheckpointCloseableIterable<IdentityGroup> listGroups(byte[] checkpoint)
       throws IOException {
+    List<GroupSummary> groups;
+    try {
+      groups = teamClient.getGroups();
+    } catch (DbxException e) {
+      throw new IOException("Failed to get groups", e);
+    }
+
     // TODO
     return null;
   }
