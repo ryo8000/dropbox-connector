@@ -32,6 +32,7 @@ import com.google.enterprise.cloudsearch.sdk.identity.Repository;
 import com.google.enterprise.cloudsearch.sdk.identity.RepositoryContext;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -107,8 +108,11 @@ final class DropBoxIdentityRepository implements Repository {
       throw new IOException("Failed to get groups", e);
     }
 
-    // TODO
-    return null;
+    List<IdentityGroup> identityGroups = new ArrayList<>();
+    for (GroupSummary group : groups) {
+      identityGroups.add(convertToIdentityGroup(group));
+    }
+    return new CheckpointCloseableIterableImpl.Builder<>(identityGroups).build();
   }
 
   /**
@@ -133,5 +137,16 @@ final class DropBoxIdentityRepository implements Repository {
       return null;
     }
     return repositoryContext.buildIdentityUser(googleId, externalId);
+  }
+
+  /**
+   * Convert a DropBox group to an identity group.
+   *
+   * @param user A DropBox group.
+   * @return An identity group.
+   */
+  private IdentityGroup convertToIdentityGroup(GroupSummary group) {
+    // TODO
+    return null;
   }
 }
