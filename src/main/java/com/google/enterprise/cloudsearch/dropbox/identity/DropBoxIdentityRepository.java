@@ -18,6 +18,7 @@ package com.google.enterprise.cloudsearch.dropbox.identity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.team.GroupMemberInfo;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.dropbox.core.v2.teamcommon.GroupSummary;
 import com.google.common.base.Strings;
@@ -142,10 +143,16 @@ final class DropBoxIdentityRepository implements Repository {
   /**
    * Convert a DropBox group to an identity group.
    *
-   * @param user A DropBox group.
+   * @param group A DropBox group.
    * @return An identity group.
    */
-  private IdentityGroup convertToIdentityGroup(GroupSummary group) {
+  private IdentityGroup convertToIdentityGroup(GroupSummary group) throws IOException {
+    List<GroupMemberInfo> groupMembers;
+    try {
+      groupMembers = teamClient.getGroupMembers(group.getGroupId());
+    } catch (DbxException e) {
+      throw new IOException("Failed to get group members", e);
+    }
     // TODO
     return null;
   }
