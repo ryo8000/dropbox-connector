@@ -147,13 +147,26 @@ final class DropBoxIdentityRepository implements Repository {
    * @return An identity group.
    */
   private IdentityGroup convertToIdentityGroup(GroupSummary group) throws IOException {
+    List<GroupMemberInfo> groupMembers = listGroupMembers(group.getGroupId());
+
+    // TODO
+    return null;
+  }
+
+  /**
+   * Retrieves all group members for the identity source.
+   *
+   * @param groupId A DropBox group ID.
+   * @return Group members.
+   * @throws IOException if unable to retrieve group members.
+   */
+  private List<GroupMemberInfo> listGroupMembers(String groupId) throws IOException {
     List<GroupMemberInfo> groupMembers;
     try {
-      groupMembers = teamClient.getGroupMembers(group.getGroupId());
+      groupMembers = teamClient.getGroupMembers(groupId);
     } catch (DbxException e) {
       throw new IOException("Failed to get group members", e);
     }
-    // TODO
-    return null;
+    return groupMembers;
   }
 }
