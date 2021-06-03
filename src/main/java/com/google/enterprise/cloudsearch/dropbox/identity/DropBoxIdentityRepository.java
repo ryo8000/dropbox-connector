@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.team.GroupMemberInfo;
+import com.dropbox.core.v2.team.MemberProfile;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.dropbox.core.v2.teamcommon.GroupSummary;
 import com.google.common.base.Strings;
@@ -149,6 +150,10 @@ final class DropBoxIdentityRepository implements Repository {
   private IdentityGroup convertToIdentityGroup(GroupSummary group) throws IOException {
     List<GroupMemberInfo> groupMembers = listGroupMembers(group.getGroupId());
 
+    List<GroupMemberInfo> filteredGroupMembers = groupMembers
+        .stream()
+        .filter(groupMember -> isValidMember(groupMember.getProfile()))
+        .collect(Collectors.toList());
     // TODO
     return null;
   }
@@ -168,5 +173,16 @@ final class DropBoxIdentityRepository implements Repository {
       throw new IOException("Failed to get group members", e);
     }
     return groupMembers;
+  }
+
+  /**
+   * Validate member.
+   *
+   * @param profile member profile.
+   * @return {@code true} if the data format is correct.
+   */
+  private boolean isValidMember(MemberProfile profile) {
+    return !(Strings.isNullOrEmpty(profile.getEmail())
+        || Strings.isNullOrEmpty(profile.getTeamMemberId()));
   }
 }
