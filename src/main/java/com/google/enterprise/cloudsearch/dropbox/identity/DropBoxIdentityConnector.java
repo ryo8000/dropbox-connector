@@ -18,7 +18,7 @@ package com.google.enterprise.cloudsearch.dropbox.identity;
 import com.google.enterprise.cloudsearch.sdk.identity.FullSyncIdentityConnector;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityApplication;
 
-/** Connector for syncing DropBox Local Groups with Google */
+/** Connector for syncing DropBox Local Groups with Google. */
 public final class DropBoxIdentityConnector {
   public static void main(String[] args) throws InterruptedException {
     IdentityApplication application =

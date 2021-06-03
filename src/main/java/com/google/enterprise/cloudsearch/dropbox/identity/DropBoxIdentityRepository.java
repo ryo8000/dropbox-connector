@@ -58,7 +58,7 @@ final class DropBoxIdentityRepository implements Repository {
   /**
    * Initializes the repository once the SDK is initialized.
    *
-   * @param context Injected context, contains convenience methods for building users & groups.
+   * @param context injected context, contains convenience methods for building users & groups.
    * @throws IOException if unable to initialize.
    */
   @Override
@@ -71,8 +71,8 @@ final class DropBoxIdentityRepository implements Repository {
   /**
    * Retrieves all user identity mappings for the identity source.
    *
-   * @param checkpoint Saved state if paging over large result sets.
-   * @return Iterator of user identity mappings.
+   * @param checkpoint saved state if paging over large result sets.
+   * @return iterator of user identity mappings.
    * @throws IOException if unable to read user identity mappings.
    */
   @Override
@@ -96,8 +96,8 @@ final class DropBoxIdentityRepository implements Repository {
   /**
    * Retrieves all group rosters for the identity source.
    *
-   * @param checkpoint Saved state if paging over large result sets.
-   * @return Iterator of group rosters.
+   * @param checkpoint saved state if paging over large result sets.
+   * @return iterator of group rosters.
    * @throws IOException if unable to read groups.
    */
   @Override
@@ -125,11 +125,10 @@ final class DropBoxIdentityRepository implements Repository {
   }
 
   /**
-   * Convert a DropBox user to an identity user.
-   * If it is not possible, return {@code null}.
+   * Convert a DropBox user to an identity user. If it is not possible, return {@code null}.
    *
-   * @param user A DropBox user.
-   * @return An identity user or {@code null}.
+   * @param user a DropBox user.
+   * @return an identity user or {@code null}.
    */
   private IdentityUser convertToIdentityUser(TeamMemberInfo user) {
     String googleId = user.getProfile().getEmail();
@@ -144,8 +143,9 @@ final class DropBoxIdentityRepository implements Repository {
   /**
    * Convert a DropBox group to an identity group.
    *
-   * @param group A DropBox group.
-   * @return An identity group.
+   * @param group a DropBox group.
+   * @return an identity group.
+   * @throws IOException if unable to convert to an identity group.
    */
   private IdentityGroup convertToIdentityGroup(GroupSummary group) throws IOException {
     List<GroupMemberInfo> groupMembers = listGroupMembers(group.getGroupId());
@@ -161,8 +161,8 @@ final class DropBoxIdentityRepository implements Repository {
   /**
    * Retrieves all group members for the identity source.
    *
-   * @param groupId A DropBox group ID.
-   * @return Group members.
+   * @param groupId a DropBox group ID.
+   * @return group members.
    * @throws IOException if unable to retrieve group members.
    */
   private List<GroupMemberInfo> listGroupMembers(String groupId) throws IOException {

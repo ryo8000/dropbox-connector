@@ -18,7 +18,7 @@ package com.google.enterprise.cloudsearch.dropbox.contents;
 import com.google.enterprise.cloudsearch.sdk.indexing.IndexingApplication;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ListingConnector;
 
-/** Connector for indexing content stored in DropBox using Google Cloud Search */
+/** Connector for indexing content stored in DropBox using Google Cloud Search. */
 public final class DropBoxConnector {
   public static void main(String[] args) throws InterruptedException {
     IndexingApplication application =

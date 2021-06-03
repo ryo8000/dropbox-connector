@@ -41,7 +41,7 @@ public final class TeamClient {
    * Fetch members of a team.
    *
    * @return team members.
-   * @throws DbxException when fetching members from DropBox fails
+   * @throws DbxException when fetching members from DropBox fails.
    */
   public List<TeamMemberInfo> getMembers() throws DbxException {
     MembersListResult result = client.team().membersList();
@@ -60,7 +60,7 @@ public final class TeamClient {
   /**
    * Fetch groups of a team.
    *
-   * @return Team groups.
+   * @return team groups.
    * @throws DbxException when fetching groups from DropBox fails.
    */
   public List<GroupSummary> getGroups() throws DbxException {
@@ -80,8 +80,8 @@ public final class TeamClient {
   /**
    * Fetch group members of a team.
    *
-   * @param groupId Team group ID.
-   * @return Team group members.
+   * @param groupId team group ID.
+   * @return team group members.
    * @throws DbxException when fetching group members from DropBox fails.
    */
   public List<GroupMemberInfo> getGroupMembers(String groupId) throws DbxException {
