@@ -22,7 +22,11 @@ import com.dropbox.core.v2.team.GroupMemberInfo;
 import com.dropbox.core.v2.team.MemberProfile;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.dropbox.core.v2.teamcommon.GroupSummary;
+import com.google.api.services.cloudidentity.v1.model.EntityKey;
+import com.google.api.services.cloudidentity.v1.model.Membership;
+import com.google.api.services.cloudidentity.v1.model.MembershipRole;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
@@ -32,12 +36,14 @@ import com.google.enterprise.cloudsearch.sdk.identity.IdentityGroup;
 import com.google.enterprise.cloudsearch.sdk.identity.IdentityUser;
 import com.google.enterprise.cloudsearch.sdk.identity.Repository;
 import com.google.enterprise.cloudsearch.sdk.identity.RepositoryContext;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -46,6 +52,9 @@ import java.util.stream.Collectors;
 final class DropBoxIdentityRepository implements Repository {
   /** Log output */
   private static final Logger log = Logger.getLogger(DropBoxIdentityRepository.class.getName());
+  /** Membership roles */
+  private static final ImmutableList<MembershipRole> MEMBER_ROLES =
+      ImmutableList.of(new MembershipRole().setName("MEMBER"));
 
   /** Injected context, provides convenience methods for building users & groups */
   private RepositoryContext repositoryContext;
@@ -154,8 +163,8 @@ final class DropBoxIdentityRepository implements Repository {
         .stream()
         .filter(groupMember -> isValidMember(groupMember.getProfile()))
         .collect(Collectors.toList());
-    // TODO
-    return null;
+    Supplier<Set<Membership>> memberships = new MembershipsSupplier(filteredGroupMembers);
+    return repositoryContext.buildIdentityGroup(group.getGroupName(), memberships);
   }
 
   /**
@@ -184,5 +193,39 @@ final class DropBoxIdentityRepository implements Repository {
   private boolean isValidMember(MemberProfile profile) {
     return !(Strings.isNullOrEmpty(profile.getEmail())
         || Strings.isNullOrEmpty(profile.getTeamMemberId()));
+  }
+
+  /** Provides group memberships based on DropBox group members information. */
+  private class MembershipsSupplier implements Supplier<Set<Membership>> {
+    /** List of DropBox members */
+    private final List<GroupMemberInfo> groupMembers;
+
+    /**
+     * Get an instance of {@link MembershipsSupplier}.
+     *
+     * @param groupMembers list of DropBox members.
+     */
+    MembershipsSupplier(List<GroupMemberInfo> groupMembers) {
+      this.groupMembers = groupMembers;
+    }
+
+    /**
+     * Provides a set of memberships based on DropBox members information.
+     *
+     * @return a set of memberships.
+     */
+    @Override
+    public Set<Membership> get() {
+      Set<Membership> members = new HashSet<>();
+      for (GroupMemberInfo groupMember : groupMembers) {
+        EntityKey key = new EntityKey().setId(groupMember.getProfile().getEmail());
+
+        Membership membership = new Membership()
+            .setPreferredMemberKey(key)
+            .setRoles(MEMBER_ROLES);
+        members.add(membership);
+      }
+      return members;
+    }
   }
 }
