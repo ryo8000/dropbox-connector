@@ -29,10 +29,13 @@ import com.dropbox.core.v2.teamcommon.GroupSummary;
 import java.util.ArrayList;
 import java.util.List;
 
+/** The client class to make remote calls to the Dropbox API team endpoints. */
 public final class TeamClient {
 
+  /** Team client */
   private final DbxTeamClientV2 client;
 
+  /** Get an instance of {@link TeamClient}. */
   public TeamClient(DbxRequestConfig requestConfig, DbxCredential credential) {
     this.client = new DbxTeamClientV2(requestConfig, credential);
   }

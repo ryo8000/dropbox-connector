@@ -20,18 +20,31 @@ import com.dropbox.core.json.JsonReader;
 import com.dropbox.core.oauth.DbxCredential;
 import com.google.enterprise.cloudsearch.sdk.InvalidConfigurationException;
 
+/** Factory class to return DropBox client. */
 public final class DropBoxClientFactory {
   private static final String IDENTIFIER = "connector";
 
   private DropBoxClientFactory() {
   }
 
+  /**
+   * Get an instance of {@link TeamClient}
+   *
+   * @param credentialFile dropBox credential file path
+   * @return an instance of {@link TeamClient}
+   */
   public static TeamClient getTeamClient(String credentialFile) {
     DbxCredential credential = createCredential(credentialFile);
     DbxRequestConfig requestConfig = new DbxRequestConfig(IDENTIFIER);
     return new TeamClient(requestConfig, credential);
   }
 
+  /**
+   * create an instance of {@link DbxCredential}
+   *
+   * @param credentialFile dropBox credential file path
+   * @return an instance of {@link DbxCredential}
+   */
   private static DbxCredential createCredential(String credentialFile) {
     DbxCredential credential;
     try {

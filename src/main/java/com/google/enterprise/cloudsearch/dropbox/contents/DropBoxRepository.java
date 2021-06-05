@@ -40,6 +40,7 @@ final class DropBoxRepository implements Repository {
   /** Log output */
   private static final Logger log = Logger.getLogger(DropBoxRepository.class.getName());
 
+  /** {@inheritDoc} */
   private TeamClient teamClient;
 
   DropBoxRepository() {
@@ -95,29 +96,61 @@ final class DropBoxRepository implements Repository {
     return allIds;
   }
 
+  /**
+   * Gets all changed documents since the last traversal.
+   *
+   * @param checkpoint encoded checkpoint bytes.
+   * @return {@link CheckpointCloseableIterable} object containing list of {@link ApiOperation} to
+   *         execute with new traversal checkpoint value.
+   * @throws RepositoryException when change detection fails.
+   */
   @Override
   public CheckpointCloseableIterable<ApiOperation> getChanges(byte[] checkpoint)
       throws RepositoryException {
+    // TODO
     return null;
   }
 
+  /**
+   * Gets a single data repository item and indexes it if required.
+   *
+   * <p>
+   * This method typically returns a {@link RepositoryDoc} object corresponding to passed
+   * {@link Item}. However, if the requested document is no longer in the data repository, then a
+   * {@link DeleteItem} operation might be returned instead.
+   *
+   * @param item the data repository item to retrieve.
+   * @return the item's state determines which type of {@link ApiOperation} is returned:
+   *         {@link RepositoryDoc}, {@link DeleteItem}, or {@link PushItem}.
+   * @throws RepositoryException when the processing of the item fails.
+   */
   @Override
   public ApiOperation getDoc(Item item) throws RepositoryException {
     // TODO
     return null;
   }
 
+  /**
+   * Not implemented by this repository.
+   */
   @Override
   public CheckpointCloseableIterable<ApiOperation> getAllDocs(byte[] checkpoint) {
     return null;
   }
 
+  /**
+   * Not implemented by this repository.
+   */
   @Override
   public boolean exists(Item item) {
     return false;
   }
 
+  /**
+   * Not implemented by this repository.
+   */
   @Override
   public void close() {
+    // Performs any data repository shut down code here.
   }
 }
