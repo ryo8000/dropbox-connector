@@ -38,7 +38,6 @@ import com.google.enterprise.cloudsearch.sdk.identity.Repository;
 import com.google.enterprise.cloudsearch.sdk.identity.RepositoryContext;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -86,7 +85,7 @@ final class DropBoxIdentityRepository implements Repository {
    */
   @Override
   public CheckpointCloseableIterable<IdentityUser> listUsers(byte[] checkpoint) throws IOException {
-    List<TeamMemberInfo> members = Collections.emptyList();
+    List<TeamMemberInfo> members;
     try {
       members = teamClient.getMembers();
     } catch (DbxException e) {
@@ -98,8 +97,7 @@ final class DropBoxIdentityRepository implements Repository {
         .map(user -> convertToIdentityUser(user))
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-    return new CheckpointCloseableIterableImpl.Builder<>(identityUsers)
-        .build();
+    return new CheckpointCloseableIterableImpl.Builder<>(identityUsers).build();
   }
 
   /**
@@ -140,12 +138,14 @@ final class DropBoxIdentityRepository implements Repository {
    * @return an identity user or {@code null}.
    */
   private IdentityUser convertToIdentityUser(TeamMemberInfo user) {
-    String googleId = user.getProfile().getEmail();
-    String externalId = user.getProfile().getTeamMemberId();
-    if (Strings.isNullOrEmpty(googleId) || Strings.isNullOrEmpty(externalId)) {
-      log.log(Level.WARNING, "Skipping invalid User: [{0}].", user);
+    MemberProfile profile = user.getProfile();
+    if (!isValidMember(profile)) {
+      log.log(Level.WARNING, "Skipping invalid User: {0}.", user);
       return null;
     }
+
+    String googleId = profile.getEmail();
+    String externalId = profile.getTeamMemberId();
     return repositoryContext.buildIdentityUser(googleId, externalId);
   }
 
