@@ -1,12 +1,25 @@
 # Google Cloud Search DropBox Connector
 
-The Google Cloud Search DropBox Connector enables indexing of content stored in a DropBox environment. This connector implements the [graph traversal strategy](https://developers.google.com/cloud-search/docs/guides/content-connector#graph-traversal) provided by the [Content Connector SDK](https://developers.google.com/cloud-search/docs/guides/content-connector).
+The Google Cloud Search DropBox Connector is a DropBox Connector that uses the [Google Cloud Search SDK](https://developers.google.com/cloud-search). It allows you to search data stored in DropBox using [Google Cloud Search](https://workspace.google.com/products/cloud-search/).
 
-Before running the DropBox content connector, you must map the principals used in DropBox to identities in the Google Cloud Identity service.
+- Using Google Cloud Search, you can search your data with high speed, high accuracy, and intuitively.
+- Users only see search results for content they have access to.
+- Google Cloud Search is available if you are using Google Workspace Business and Enterprise editions.
+- This connector implements the [graph traversal strategy](https://developers.google.com/cloud-search/docs/guides/content-connector#graph-traversal) provided by the [Content Connector SDK](https://developers.google.com/cloud-search/docs/guides/content-connector).
+- Before running the DropBox content connector, you must map the principals used in DropBox to identities in the Google Cloud Identity service.
 
 ## Build instructions
 
-1. Build the connector
+Building this connector requires the following development tools:
+
+- Java SE Development Kit (JDK) version 1.8.0_20 or greater
+- Apache Maven version 3.3.0 or greater.
+
+1. Install the Google Cloud Search SDK
+
+   For more details, please refer to [this GitHub page](https://github.com/google-cloudsearch/connector-sdk).
+
+2. Build this DropBox Connector
 
    a. Build the ZIP file:
 
@@ -16,21 +29,53 @@ Before running the DropBox content connector, you must map the principals used i
 
    (To skip the tests when building the connector, use `mvn package -DskipTests`)
 
-2. Install the connector
+   this command creates a ZIP file containing the connector and its dependencies with a name like `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.zip`.
 
-   The `mvn package` command creates a ZIP file containing the connector and its dependencies with a name like `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.zip`.
+3. Install the connector
 
-   a. Copy this ZIP file to the location where you want to install the connector.
+   a. Copy the ZIP file to the location where you want to install the connector.
 
    b. Unzip the connector ZIP file. A directory with a name like `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT` will be created.
 
    c. Change into this directory. You should see the connector jar file, `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.jar`, as well as a `lib` directory containing the connector's dependencies.
 
-3. Configure the connector
+4. Configure the connector
 
    a. Create a file containing the connector configuration parameters.
 
-4. Run the connector
+   Example: "my.config"
+
+   ```
+   api.sourceId=<DATA_SOURCE_ID>
+   api.identitySourceId=<IDENTITY_SOURCE_ID>
+   api.customerId=<CUSTOMER_ID>
+   api.serviceAccountPrivateKeyFile=<PATH_TO_SERVICE_ACCOUNT_KEY>
+   dropbox.credentialFile=<PATH_TO_DROPBOX_CREDENTIAL_FILE>
+   ```
+
+   - `api.sourceId`: the ID of the data source to synchronize the data with.
+
+   - `api.identitySourceId`: the ID of a Cloud Identity source.
+
+   - `api.customerId`: the google customer ID.
+
+   - `api.serviceAccountKey`: path to JSON file containing the credentials of a service account that can access the Google APIs.
+
+   - `dropbox.credentialFile`: path to JSON file containing the credentials that can access the Dropbox APIs.
+
+     Example: "my-app.json"
+
+     ```
+     {
+        "access_token": <ACCESS_TOKEN>,
+        "app_key": <APP_KEY>,
+        "app_secret": <APP_SECRET>
+     }
+     ```
+
+     - Preferably, access token expiration is "no expiration". Otherwise, the connector will stop processing during operation.
+
+5. Run the connector
 
    The connector should be run from the unzipped installation directory, **not** the source code's `target` directory.
 
