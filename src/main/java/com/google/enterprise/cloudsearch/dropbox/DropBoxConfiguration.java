@@ -19,12 +19,18 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.enterprise.cloudsearch.sdk.InvalidConfigurationException;
 import com.google.enterprise.cloudsearch.sdk.config.Configuration;
+import java.util.Collections;
+import java.util.List;
 
 public final class DropBoxConfiguration {
 
   private static final String CREDENTIAL_FILE = "dropbox.credentialFile";
+  /** Configuration key for list of team member IDs to be processed */
+  private static final String TEAM_MEMBER_IDS = "dropbox.teamMemberIds";
 
   private final String credentialFile;
+  /** List of team member IDs to be processed */
+  private final List<String> teamMemberIds;
 
   private DropBoxConfiguration() {
     String configCredentialFile = Configuration.getString(CREDENTIAL_FILE, "").get();
@@ -32,6 +38,8 @@ public final class DropBoxConfiguration {
       throw new InvalidConfigurationException("credentialFile can not be empty");
     }
     this.credentialFile = configCredentialFile;
+    this.teamMemberIds = Configuration
+        .getMultiValue(TEAM_MEMBER_IDS, Collections.emptyList(), Configuration.STRING_PARSER).get();
   }
 
   public static DropBoxConfiguration fromConfiguration() {
@@ -43,10 +51,17 @@ public final class DropBoxConfiguration {
     return credentialFile;
   }
 
+  /** Gets list of team member IDs to be processed. */
+  public List<String> getTeamMemberIds() {
+    return teamMemberIds;
+  }
+
   @Override
   public String toString() {
     return "DropBoxConfiguration [credentialFile="
         + credentialFile
+        + ", teamMemberIds="
+        + teamMemberIds
         + "]";
   }
 }

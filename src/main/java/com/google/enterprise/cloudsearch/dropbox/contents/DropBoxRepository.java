@@ -42,6 +42,8 @@ final class DropBoxRepository implements Repository {
 
   /** {@inheritDoc} */
   private TeamClient teamClient;
+  /** List of team member IDs to be processed */
+  private List<String> teamMemberIds;
 
   DropBoxRepository() {
   }
@@ -55,6 +57,7 @@ final class DropBoxRepository implements Repository {
   @Override
   public void init(RepositoryContext repositoryContext) throws RepositoryException {
     DropBoxConfiguration dropBoxConfiguration = DropBoxConfiguration.fromConfiguration();
+    teamMemberIds = dropBoxConfiguration.getTeamMemberIds();
     teamClient = DropBoxClientFactory.getTeamClient(dropBoxConfiguration.getCredentialFile());
   }
 
@@ -79,8 +82,13 @@ final class DropBoxRepository implements Repository {
       List<TeamMemberInfo> members = teamClient.getMembers();
 
       for (TeamMemberInfo member : members) {
-        // TODO
+        String teamMemberId = member.getProfile().getTeamMemberId();
 
+        if (!(teamMemberIds.isEmpty() || teamMemberIds.contains(teamMemberId))) {
+          continue;
+        }
+
+        // TODO
       }
     } catch (DbxException e) {
       throw new RepositoryException.Builder()
