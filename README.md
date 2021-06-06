@@ -1,5 +1,7 @@
 # Google Cloud Search DropBox Connector
 
+**Note:** This product is under construction. It is not yet finished.
+
 The Google Cloud Search DropBox Connector is a DropBox Connector that uses the [Google Cloud Search SDK](https://developers.google.com/cloud-search). It allows you to search data stored in DropBox using [Google Cloud Search](https://workspace.google.com/products/cloud-search/).
 
 - Using Google Cloud Search, you can search your data with high speed, high accuracy, and intuitively.
@@ -51,6 +53,7 @@ Building this connector requires the following development tools:
    api.customerId=<CUSTOMER_ID>
    api.serviceAccountPrivateKeyFile=<PATH_TO_SERVICE_ACCOUNT_KEY>
    dropbox.credentialFile=<PATH_TO_DROPBOX_CREDENTIAL_FILE>
+   dropbox.teamMemberIds=<LIST_OF_TEAM_MEMBER_IDS>
    ```
 
    - `api.sourceId`: the ID of the data source to synchronize the data with.
@@ -75,16 +78,34 @@ Building this connector requires the following development tools:
 
      - Preferably, access token expiration is "no expiration". Otherwise, the connector will stop processing during operation.
 
+   - `dropbox.teamMemberIds`: List of team member IDs to be processed. The default is an empty string.
+
 5. Run the connector
 
    The connector should be run from the unzipped installation directory, **not** the source code's `target` directory.
 
+   a. Run the Identity connector
+
+   Identity connectors are used to map your enterprise's identities and group rosters to the Google accounts and groups used by Google Cloud Search.
+
    ```
    java \
       -jar google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.jar \
+      --identity \
       -Dconfig=my.config
    ```
 
    Where `my.config` is the configuration file containing the parameters for the connector execution.
 
    **Note:** If the configuration file is not specified, a default file name of `connector-config.properties` will be assumed.
+
+   b. Run the Content connector
+
+   Content connectors are used to traverse a repository and index the data so that Google Cloud Search can effectively search that data.
+
+   ```
+   java \
+      -jar google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.jar \
+      --dropbox \
+      -Dconfig=my.config
+   ```
