@@ -15,7 +15,12 @@
  */
 package com.google.enterprise.cloudsearch.dropbox.client;
 
+import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
+import java.util.ArrayList;
+import java.util.List;
 
 /** The client class to make remote calls to the Dropbox API user endpoints. */
 public final class MemberClient {
@@ -26,5 +31,26 @@ public final class MemberClient {
   /** Get an instance of {@link MemberClient} */
   MemberClient(DbxClientV2 client) {
     this.client = client;
+  }
+
+  /**
+   * Fetch files and folders in the folder.
+   *
+   * @param path parent folder path
+   * @return files and folders in the folder.
+   * @throws DbxException when fetching files and folders from DropBox fails.
+   */
+  public List<Metadata> listFolder(String path) throws DbxException {
+    ListFolderResult result = client.files().listFolder(path);
+    List<Metadata> listFolder = new ArrayList<>();
+
+    while (true) {
+      listFolder.addAll(result.getEntries());
+      if (!result.getHasMore()) {
+        break;
+      }
+      result = client.files().listFolderContinue(result.getCursor());
+    }
+    return listFolder;
   }
 }

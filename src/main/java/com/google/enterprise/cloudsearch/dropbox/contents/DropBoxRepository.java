@@ -16,6 +16,7 @@
 package com.google.enterprise.cloudsearch.dropbox.contents;
 
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.google.api.services.cloudsearch.v1.model.Item;
 import com.google.api.services.cloudsearch.v1.model.PushItem;
@@ -34,7 +35,9 @@ import com.google.enterprise.cloudsearch.sdk.indexing.template.Repository;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -193,5 +196,26 @@ final class DropBoxRepository implements Repository {
   @Override
   public void close() {
     // Performs any data repository shut down code here.
+  }
+
+  /**
+   * Get the child items under the item to be processed.
+   * {@code path} argument should be the path to the item to be processed.
+   */
+  private Map<String, PushItem> getChildItems(MemberClient memberClient, String path)
+      throws IOException {
+    Map<String, PushItem> items = new HashMap<>();
+
+    List<Metadata> contents;
+    try {
+      contents = memberClient.listFolder(path);
+    } catch (DbxException e) {
+      throw new IOException(e);
+    }
+
+    for (Metadata content : contents) {
+      // TODO
+    }
+    return items;
   }
 }
