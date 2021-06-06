@@ -15,14 +15,13 @@
  */
 package com.google.enterprise.cloudsearch.dropbox.contents;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.google.api.services.cloudsearch.v1.model.Item;
 import com.google.api.services.cloudsearch.v1.model.PushItem;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
+import com.google.enterprise.cloudsearch.dropbox.client.MemberClient;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.dropbox.model.DropBoxObject;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
@@ -159,6 +158,8 @@ final class DropBoxRepository implements Repository {
       // TODO
       return ApiOperations.deleteItem(item.getName());
     }
+
+    MemberClient memberClient = teamClient.asMember(dropBoxObject.getTeamMemberId());
 
     // TODO
     switch (dropBoxObject.getObjectType()) {

@@ -41,6 +41,17 @@ public final class TeamClient {
   }
 
   /**
+   * Returns a {@link MemberClient} that performs requests against Dropbox API user endpoints as the
+   * given team member.
+   *
+   * @param teamMemberId team member ID of member in this client's team.
+   * @return dropbox client that as the given team member.
+   */
+  public MemberClient asMember(String teamMemberId) {
+    return new MemberClient(client.asMember(teamMemberId));
+  }
+
+  /**
    * Fetch members of a team.
    *
    * @return team members.
