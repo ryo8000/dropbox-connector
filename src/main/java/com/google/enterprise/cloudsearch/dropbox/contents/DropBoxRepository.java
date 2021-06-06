@@ -24,15 +24,19 @@ import com.google.api.services.cloudsearch.v1.model.PushItem;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
+import com.google.enterprise.cloudsearch.dropbox.model.DropBoxObject;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterableImpl;
 import com.google.enterprise.cloudsearch.sdk.RepositoryException;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperation;
+import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperations;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.PushItems;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.Repository;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Repository implementation for indexing content from DropBox repository. */
@@ -83,14 +87,21 @@ final class DropBoxRepository implements Repository {
 
       for (TeamMemberInfo member : members) {
         String teamMemberId = member.getProfile().getTeamMemberId();
+        String memberName = member.getProfile().getName().getDisplayName();
 
         if (!(teamMemberIds.isEmpty() || teamMemberIds.contains(teamMemberId))) {
           continue;
         }
 
-        // TODO
+        DropBoxObject dropBoxObject =
+            new DropBoxObject.Builder(DropBoxObject.MEMBER, teamMemberId)
+                .build();
+
+        pushItemsBuilder.addPushItem(
+            memberName,
+            new PushItem().encodePayload(dropBoxObject.encodePayload()));
       }
-    } catch (DbxException e) {
+    } catch (DbxException | IOException e) {
       throw new RepositoryException.Builder()
           .setErrorMessage("Failed to get user IDs")
           .setCause(e)
@@ -134,7 +145,28 @@ final class DropBoxRepository implements Repository {
    */
   @Override
   public ApiOperation getDoc(Item item) throws RepositoryException {
+    DropBoxObject dropBoxObject;
+    try {
+      dropBoxObject = DropBoxObject.decodePayload(item.decodePayload());
+    } catch (IOException e) {
+      log.log(Level.WARNING, String.format("Invalid DropBox payload Object on item %s", item), e);
+      // TODO
+      return ApiOperations.deleteItem(item.getName());
+    }
+    if (!dropBoxObject.isValid()) {
+      log.log(Level.WARNING, "Invalid DropBox payload Object {0} on item {1}",
+          new Object[] {dropBoxObject, item});
+      // TODO
+      return ApiOperations.deleteItem(item.getName());
+    }
+
     // TODO
+    switch (dropBoxObject.getObjectType()) {
+      case DropBoxObject.MEMBER:
+        break;
+      default:
+        break;
+    }
     return null;
   }
 
