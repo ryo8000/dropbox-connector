@@ -15,10 +15,13 @@
  */
 package com.google.enterprise.cloudsearch.dropbox.contents;
 
+import static com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder.FieldOrValue.withValue;
+
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.google.api.services.cloudsearch.v1.model.Item;
+import com.google.api.services.cloudsearch.v1.model.Principal;
 import com.google.api.services.cloudsearch.v1.model.PushItem;
 import com.google.enterprise.cloudsearch.dropbox.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
@@ -28,11 +31,16 @@ import com.google.enterprise.cloudsearch.dropbox.model.DropBoxObject;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterableImpl;
 import com.google.enterprise.cloudsearch.sdk.RepositoryException;
+import com.google.enterprise.cloudsearch.sdk.indexing.Acl;
+import com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder;
+import com.google.enterprise.cloudsearch.sdk.indexing.StructuredData;
+import com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder.ItemType;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperation;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperations;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.PushItems;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.Repository;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext;
+import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryDoc;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -165,13 +173,19 @@ final class DropBoxRepository implements Repository {
     MemberClient memberClient = teamClient.asMember(dropBoxObject.getTeamMemberId());
 
     // TODO
-    switch (dropBoxObject.getObjectType()) {
-      case DropBoxObject.MEMBER:
-        break;
-      default:
-        break;
+    try {
+      switch (dropBoxObject.getObjectType()) {
+        case DropBoxObject.MEMBER:
+          return createMemberDoc(memberClient, item, dropBoxObject);
+        default:
+          return null;
+      }
+    } catch (IOException e) {
+      throw new RepositoryException.Builder()
+          .setErrorMessage("Failed to process item")
+          .setCause(e)
+          .build();
     }
-    return null;
   }
 
   /**
@@ -196,6 +210,39 @@ final class DropBoxRepository implements Repository {
   @Override
   public void close() {
     // Performs any data repository shut down code here.
+  }
+
+
+  /**
+   * Create a document to index the member's root information.
+   */
+  private ApiOperation createMemberDoc(MemberClient memberClient, Item polledItem,
+      DropBoxObject dropBoxObject) throws IOException {
+    String teamMemberId = dropBoxObject.getTeamMemberId();
+
+    // ACL
+    List<Principal> users = Collections.singletonList(Acl.getUserPrincipal(teamMemberId));
+    Acl acl = new Acl.Builder()
+        .setReaders(users)
+        .build();
+
+    // build item
+    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
+        // .setTitle(withValue(title))
+        .setItemType(ItemType.CONTAINER_ITEM)
+        .setAcl(acl)
+        // .setSourceRepositoryUrl(withValue(url))
+        .setPayload(polledItem.decodePayload());
+    if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
+      itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
+    }
+    Item item = itemBuilder.build();
+
+    RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
+
+    // child items
+
+    return null;
   }
 
   /**
