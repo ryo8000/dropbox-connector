@@ -36,6 +36,8 @@ public final class DropBoxObject extends GenericJson {
   private static final String MEMBER_ID_PREFIX = "dbmid:";
 
   public static final String MEMBER = "member";
+  public static final String FOLDER = "folder";
+  public static final String FILE = "file";
 
   /** DropBox object type */
   private static final Set<String> SUPPORTED_TYPE = ImmutableSet.of(MEMBER);

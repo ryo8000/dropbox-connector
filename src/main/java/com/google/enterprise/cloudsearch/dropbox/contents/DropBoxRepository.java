@@ -18,6 +18,8 @@ package com.google.enterprise.cloudsearch.dropbox.contents;
 import static com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder.FieldOrValue.withValue;
 
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.google.api.services.cloudsearch.v1.model.Item;
@@ -53,6 +55,8 @@ import java.util.logging.Logger;
 final class DropBoxRepository implements Repository {
   /** Log output */
   private static final Logger log = Logger.getLogger(DropBoxRepository.class.getName());
+  /** Member's root path */
+  private static final String ROOT_PATH = "";
 
   /** {@inheritDoc} */
   private TeamClient teamClient;
@@ -241,16 +245,18 @@ final class DropBoxRepository implements Repository {
     RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
 
     // child items
+    Map<String, PushItem> items = getChildItems(teamMemberId, memberClient, ROOT_PATH);
+    items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
 
-    return null;
+    return docBuilder.build();
   }
 
   /**
    * Get the child items under the item to be processed.
    * {@code path} argument should be the path to the item to be processed.
    */
-  private Map<String, PushItem> getChildItems(MemberClient memberClient, String path)
-      throws IOException {
+  private Map<String, PushItem> getChildItems(String teamMemberId,
+      MemberClient memberClient, String path) throws IOException {
     Map<String, PushItem> items = new HashMap<>();
 
     List<Metadata> contents;
@@ -261,7 +267,24 @@ final class DropBoxRepository implements Repository {
     }
 
     for (Metadata content : contents) {
+      DropBoxObject dropBoxObject = null;
+
+      if (content instanceof FolderMetadata) {
+        FolderMetadata folder = (FolderMetadata) content;
+        dropBoxObject =
+            new DropBoxObject.Builder(DropBoxObject.FOLDER, teamMemberId)
+                .build();
+      } else if (content instanceof FileMetadata) {
+        FileMetadata file = (FileMetadata) content;
+        dropBoxObject =
+            new DropBoxObject.Builder(DropBoxObject.FILE, teamMemberId)
+                .build();
+      } else {
+        continue;
+      }
+
       // TODO
+      new PushItem().encodePayload(dropBoxObject.encodePayload());
     }
     return items;
   }
