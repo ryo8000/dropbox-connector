@@ -21,6 +21,7 @@ import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.Set;
@@ -40,12 +41,14 @@ public final class DropBoxObject extends GenericJson {
   public static final String FILE = "file";
 
   /** DropBox object type */
-  private static final Set<String> SUPPORTED_TYPE = ImmutableSet.of(MEMBER);
+  private static final Set<String> SUPPORTED_TYPE = ImmutableSet.of(MEMBER, FOLDER, FILE);
 
   @Key
   private String objectType;
   @Key
   private String teamMemberId;
+  @Key
+  private String memberDisplayName;
 
   /** Default constructor for json parsing. */
   public DropBoxObject() {
@@ -57,6 +60,7 @@ public final class DropBoxObject extends GenericJson {
   public DropBoxObject(Builder builder) {
     this.objectType = builder.objectType;
     this.teamMemberId = builder.teamMemberId;
+    this.memberDisplayName = builder.memberDisplayName;
     setFactory(JSON_FACTORY);
   }
 
@@ -99,7 +103,9 @@ public final class DropBoxObject extends GenericJson {
    * @return {@code true} if an instance of {@link DropBoxObject} is correct
    */
   public boolean isValid() {
-    return teamMemberId.startsWith(MEMBER_ID_PREFIX) && SUPPORTED_TYPE.contains(objectType);
+    return teamMemberId.startsWith(MEMBER_ID_PREFIX)
+        && SUPPORTED_TYPE.contains(objectType)
+        && !Strings.isNullOrEmpty(memberDisplayName);
   }
 
   /** Gets dropBox object type. */
@@ -110,6 +116,11 @@ public final class DropBoxObject extends GenericJson {
   /** Gets team member ID. */
   public String getTeamMemberId() {
     return teamMemberId;
+  }
+
+  /** Gets member display name. */
+  public String getMemberDisplayName() {
+    return memberDisplayName;
   }
 
   @Override
@@ -123,17 +134,21 @@ public final class DropBoxObject extends GenericJson {
     private String objectType;
     /** Team member ID */
     private String teamMemberId;
+    /** Member display name */
+    private String memberDisplayName;
 
     /**
-     * Constructs a {@link DropBoxObject.Builder} that wraps given DropBox object type and team
-     * member ID.
+     * Constructs a {@link DropBoxObject.Builder} that wraps given DropBox object type, team
+     * member ID and member display name.
      *
-     * @param objectType   dropBox object type
-     * @param teamMemberId team member ID
+     * @param objectType        dropBox object type
+     * @param teamMemberId      team member ID
+     * @param memberDisplayName member display name
      */
-    public Builder(String objectType, String teamMemberId) {
+    public Builder(String objectType, String teamMemberId, String memberDisplayName) {
       this.objectType = objectType;
       this.teamMemberId = teamMemberId;
+      this.memberDisplayName = memberDisplayName;
     }
 
     /**

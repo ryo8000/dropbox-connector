@@ -108,7 +108,7 @@ final class DropBoxRepository implements Repository {
         }
 
         DropBoxObject dropBoxObject =
-            new DropBoxObject.Builder(DropBoxObject.MEMBER, teamMemberId)
+            new DropBoxObject.Builder(DropBoxObject.MEMBER, teamMemberId, memberName)
                 .build();
 
         pushItemsBuilder.addPushItem(
@@ -222,6 +222,7 @@ final class DropBoxRepository implements Repository {
    */
   private ApiOperation createMemberDoc(MemberClient memberClient, Item polledItem,
       DropBoxObject dropBoxObject) throws IOException {
+    String memberName = dropBoxObject.getMemberDisplayName();
     String teamMemberId = dropBoxObject.getTeamMemberId();
 
     // ACL
@@ -232,7 +233,7 @@ final class DropBoxRepository implements Repository {
 
     // build item
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
-        // .setTitle(withValue(title))
+        .setTitle(withValue(memberName))
         .setItemType(ItemType.CONTAINER_ITEM)
         .setAcl(acl)
         // .setSourceRepositoryUrl(withValue(url))
@@ -245,7 +246,7 @@ final class DropBoxRepository implements Repository {
     RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
 
     // child items
-    Map<String, PushItem> items = getChildItems(teamMemberId, memberClient, ROOT_PATH);
+    Map<String, PushItem> items = getChildItems(teamMemberId, memberName, memberClient, ROOT_PATH);
     items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
 
     return docBuilder.build();
@@ -255,7 +256,7 @@ final class DropBoxRepository implements Repository {
    * Get the child items under the item to be processed.
    * {@code path} argument should be the path to the item to be processed.
    */
-  private Map<String, PushItem> getChildItems(String teamMemberId,
+  private Map<String, PushItem> getChildItems(String teamMemberId, String memberName,
       MemberClient memberClient, String path) throws IOException {
     Map<String, PushItem> items = new HashMap<>();
 
@@ -272,12 +273,12 @@ final class DropBoxRepository implements Repository {
       if (content instanceof FolderMetadata) {
         FolderMetadata folder = (FolderMetadata) content;
         dropBoxObject =
-            new DropBoxObject.Builder(DropBoxObject.FOLDER, teamMemberId)
+            new DropBoxObject.Builder(DropBoxObject.FOLDER, teamMemberId, memberName)
                 .build();
       } else if (content instanceof FileMetadata) {
         FileMetadata file = (FileMetadata) content;
         dropBoxObject =
-            new DropBoxObject.Builder(DropBoxObject.FILE, teamMemberId)
+            new DropBoxObject.Builder(DropBoxObject.FILE, teamMemberId, memberName)
                 .build();
       } else {
         continue;
