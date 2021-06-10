@@ -36,7 +36,7 @@ public final class TeamClient {
   private final DbxTeamClientV2 client;
 
   /** Get an instance of {@link TeamClient}. */
-  public TeamClient(DbxRequestConfig requestConfig, DbxCredential credential) {
+  TeamClient(DbxRequestConfig requestConfig, DbxCredential credential) {
     this.client = new DbxTeamClientV2(requestConfig, credential);
   }
 

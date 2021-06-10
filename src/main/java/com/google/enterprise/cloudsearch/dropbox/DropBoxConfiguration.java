@@ -22,7 +22,7 @@ import com.google.enterprise.cloudsearch.sdk.config.Configuration;
 import java.util.Collections;
 import java.util.List;
 
-public final class DropBoxConfiguration {
+public class DropBoxConfiguration {
 
   private static final String CREDENTIAL_FILE = "dropbox.credentialFile";
   /** Configuration key for list of team member IDs to be processed */

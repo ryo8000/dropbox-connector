@@ -21,7 +21,7 @@ import com.dropbox.core.oauth.DbxCredential;
 import com.google.enterprise.cloudsearch.sdk.InvalidConfigurationException;
 
 /** Factory class to return DropBox client. */
-public final class DropBoxClientFactory {
+public class DropBoxClientFactory {
   private static final String IDENTIFIER = "connector";
 
   private DropBoxClientFactory() {

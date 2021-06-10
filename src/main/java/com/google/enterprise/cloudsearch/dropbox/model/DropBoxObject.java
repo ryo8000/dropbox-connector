@@ -57,7 +57,7 @@ public final class DropBoxObject extends GenericJson {
   }
 
   /** Gets an instance of {@link DropBoxObject}. */
-  public DropBoxObject(Builder builder) {
+  private DropBoxObject(Builder builder) {
     this.objectType = builder.objectType;
     this.teamMemberId = builder.teamMemberId;
     this.memberDisplayName = builder.memberDisplayName;
