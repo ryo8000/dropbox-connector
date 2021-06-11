@@ -93,9 +93,9 @@ final class DropBoxRepository implements Repository {
   @Override
   public CheckpointCloseableIterable<ApiOperation> getIds(byte[] checkpoint)
       throws RepositoryException {
-    log.entering("DropBoxConnector", "getIds");
     PushItems.Builder pushItemsBuilder = new PushItems.Builder();
 
+    int totalMembers = 0;
     try {
       List<TeamMemberInfo> members = teamClient.getMembers();
 
@@ -104,16 +104,17 @@ final class DropBoxRepository implements Repository {
         String memberName = member.getProfile().getName().getDisplayName();
 
         if (!(teamMemberIds.isEmpty() || teamMemberIds.contains(teamMemberId))) {
+          log.log(Level.FINE, "skip member {0}", teamMemberId);
           continue;
         }
+        totalMembers++;
 
         DropBoxObject dropBoxObject =
             new DropBoxObject.Builder(DropBoxObject.MEMBER, teamMemberId, memberName)
                 .build();
 
         pushItemsBuilder.addPushItem(
-            memberName,
-            new PushItem().encodePayload(dropBoxObject.encodePayload()));
+            memberName, new PushItem().encodePayload(dropBoxObject.encodePayload()));
       }
     } catch (DbxException | IOException e) {
       throw new RepositoryException.Builder()
@@ -125,7 +126,9 @@ final class DropBoxRepository implements Repository {
     ApiOperation pushItems = pushItemsBuilder.build();
     CheckpointCloseableIterable<ApiOperation> allIds =
         new CheckpointCloseableIterableImpl.Builder<>(Collections.singleton(pushItems)).build();
-    log.exiting("DropBoxConnector", "getIds");
+    log.log(Level.INFO,
+        "process of get user IDs has been completed successfully. total member: {0}",
+        totalMembers);
     return allIds;
   }
 
@@ -164,13 +167,11 @@ final class DropBoxRepository implements Repository {
       dropBoxObject = DropBoxObject.decodePayload(item.decodePayload());
     } catch (IOException e) {
       log.log(Level.WARNING, String.format("Invalid DropBox payload Object on item %s", item), e);
-      // TODO
       return ApiOperations.deleteItem(item.getName());
     }
     if (!dropBoxObject.isValid()) {
       log.log(Level.WARNING, "Invalid DropBox payload Object {0} on item {1}",
           new Object[] {dropBoxObject, item});
-      // TODO
       return ApiOperations.deleteItem(item.getName());
     }
 
@@ -186,7 +187,7 @@ final class DropBoxRepository implements Repository {
       }
     } catch (IOException e) {
       throw new RepositoryException.Builder()
-          .setErrorMessage("Failed to process item")
+          .setErrorMessage(String.format("Failed to process item: [%s]", item.getName()))
           .setCause(e)
           .build();
     }
