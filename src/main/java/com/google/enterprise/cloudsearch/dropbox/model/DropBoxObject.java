@@ -24,16 +24,18 @@ import com.google.api.client.util.Key;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/** Payload object for saving per document / item state. */
 public final class DropBoxObject extends GenericJson {
   /** Log output */
   private static final Logger log = Logger.getLogger(DropBoxObject.class.getName());
   /** JSON Factory */
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
+  /** Member ID prefix */
   private static final String MEMBER_ID_PREFIX = "dbmid:";
 
   public static final String MEMBER = "member";
@@ -49,6 +51,32 @@ public final class DropBoxObject extends GenericJson {
   private String teamMemberId;
   @Key
   private String memberDisplayName;
+  @Key
+  private String id;
+  @Key
+  private String name;
+  @Key
+  private String pathDisplay;
+  @Key
+  private String pathLower;
+  @Key
+  private String parentSharedFolderId;
+  @Key
+  private String sharedFolderId;
+  @Key
+  private Date clientModified;
+  @Key
+  private String contentHash;
+  @Key
+  private Boolean hasExplicitSharedMembers;
+  @Key
+  private boolean isDownloadable;
+  @Key
+  private String rev;
+  @Key
+  private Date serverModified;
+  @Key
+  private long size;
 
   /** Default constructor for json parsing. */
   public DropBoxObject() {
@@ -61,6 +89,19 @@ public final class DropBoxObject extends GenericJson {
     this.objectType = builder.objectType;
     this.teamMemberId = builder.teamMemberId;
     this.memberDisplayName = builder.memberDisplayName;
+    this.id = builder.id;
+    this.name = builder.name;
+    this.pathDisplay = builder.pathDisplay;
+    this.pathLower = builder.pathLower;
+    this.parentSharedFolderId = builder.parentSharedFolderId;
+    this.sharedFolderId = builder.sharedFolderId;
+    this.clientModified = builder.clientModified;
+    this.contentHash = builder.contentHash;
+    this.hasExplicitSharedMembers = builder.hasExplicitSharedMembers;
+    this.isDownloadable = builder.isDownloadable;
+    this.rev = builder.rev;
+    this.size = builder.size;
+    this.serverModified = builder.serverModified;
     setFactory(JSON_FACTORY);
   }
 
@@ -123,6 +164,58 @@ public final class DropBoxObject extends GenericJson {
     return memberDisplayName;
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getPathDisplay() {
+    return pathDisplay;
+  }
+
+  public String getPathLower() {
+    return pathLower;
+  }
+
+  public String getParentSharedFolderId() {
+    return parentSharedFolderId;
+  }
+
+  public String getSharedFolderId() {
+    return sharedFolderId;
+  }
+
+  public Date getClientModified() {
+    return clientModified;
+  }
+
+  public String getContentHash() {
+    return contentHash;
+  }
+
+  public Boolean getHasExplicitSharedMembers() {
+    return hasExplicitSharedMembers;
+  }
+
+  public boolean getIsDownloadable() {
+    return isDownloadable;
+  }
+
+  public String getRev() {
+    return rev;
+  }
+
+  public Date getServerModified() {
+    return serverModified;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
   @Override
   public String toString() {
     return super.toString();
@@ -136,6 +229,19 @@ public final class DropBoxObject extends GenericJson {
     private String teamMemberId;
     /** Member display name */
     private String memberDisplayName;
+    private String id = "";
+    private String name = "";
+    private String pathDisplay = "";
+    private String pathLower = "";
+    private String parentSharedFolderId = "";
+    private String sharedFolderId = "";
+    private Date clientModified = null;
+    private String contentHash = "";
+    private Boolean hasExplicitSharedMembers = null;
+    private boolean isDownloadable = false;
+    private String rev = "";
+    private Date serverModified = null;
+    private long size = 0L;
 
     /**
      * Constructs a {@link DropBoxObject.Builder} that wraps given DropBox object type, team
@@ -149,6 +255,71 @@ public final class DropBoxObject extends GenericJson {
       this.objectType = objectType;
       this.teamMemberId = teamMemberId;
       this.memberDisplayName = memberDisplayName;
+    }
+
+    public Builder setId(String id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder setPathDisplay(String pathDisplay) {
+      this.pathDisplay = pathDisplay;
+      return this;
+    }
+
+    public Builder setPathLower(String pathLower) {
+      this.pathLower = pathLower;
+      return this;
+    }
+
+    public Builder setParentSharedFolderId(String parentSharedFolderId) {
+      this.parentSharedFolderId = Strings.nullToEmpty(parentSharedFolderId);
+      return this;
+    }
+
+    public Builder setSharedFolderId(String sharedFolderId) {
+      this.sharedFolderId = Strings.nullToEmpty(sharedFolderId);
+      return this;
+    }
+
+    public Builder setClientModified(Date clientModified) {
+      this.clientModified = clientModified;
+      return this;
+    }
+
+    public Builder setContentHash(String contentHash) {
+      this.contentHash = contentHash;
+      return this;
+    }
+
+    public Builder setHasExplicitSharedMembers(Boolean hasExplicitSharedMembers) {
+      this.hasExplicitSharedMembers = hasExplicitSharedMembers;
+      return this;
+    }
+
+    public Builder setDownloadable(boolean isDownloadable) {
+      this.isDownloadable = isDownloadable;
+      return this;
+    }
+
+    public Builder setRev(String rev) {
+      this.rev = rev;
+      return this;
+    }
+
+    public Builder setServerModified(Date serverModified) {
+      this.serverModified = serverModified;
+      return this;
+    }
+
+    public Builder setSize(long size) {
+      this.size = size;
+      return this;
     }
 
     /**
