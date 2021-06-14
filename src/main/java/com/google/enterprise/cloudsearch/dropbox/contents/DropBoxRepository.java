@@ -22,6 +22,7 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.team.TeamMemberInfo;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.cloudsearch.v1.model.Item;
 import com.google.api.services.cloudsearch.v1.model.Principal;
 import com.google.api.services.cloudsearch.v1.model.PushItem;
@@ -182,6 +183,10 @@ final class DropBoxRepository implements Repository {
       switch (dropBoxObject.getObjectType()) {
         case DropBoxObject.MEMBER:
           return createMemberDoc(memberClient, item, dropBoxObject);
+        case DropBoxObject.FOLDER:
+          return createFolderDoc(memberClient, item, dropBoxObject);
+        case DropBoxObject.FILE:
+          return createFileDoc(item, dropBoxObject);
         default:
           return null;
       }
@@ -248,6 +253,68 @@ final class DropBoxRepository implements Repository {
     // child items
     Map<String, PushItem> items = getChildItems(teamMemberId, memberName, memberClient, ROOT_PATH);
     items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
+
+    return docBuilder.build();
+  }
+
+  /**
+   * Create a document to index a folder.
+   */
+  private ApiOperation createFolderDoc(MemberClient memberClient, Item polledItem,
+      DropBoxObject dropBoxObject) throws IOException {
+    String memberName = dropBoxObject.getMemberDisplayName();
+    String teamMemberId = dropBoxObject.getTeamMemberId();
+    String folderPath = dropBoxObject.getPathDisplay();
+
+    // ACL
+    // TODO
+
+    // build item
+    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
+        .setTitle(withValue(dropBoxObject.getName()))
+        .setItemType(ItemType.CONTAINER_ITEM)
+        // .setAcl(acl)
+        // .setSourceRepositoryUrl(withValue(url))
+        .setPayload(polledItem.decodePayload());
+    if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
+      itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
+    }
+    Item item = itemBuilder.build();
+
+    RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
+
+    // child items
+    Map<String, PushItem> items = getChildItems(teamMemberId, memberName, memberClient, folderPath);
+    items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
+
+    return docBuilder.build();
+  }
+
+  /**
+   * Create a document to index a file.
+   */
+  private ApiOperation createFileDoc(Item polledItem, DropBoxObject dropBoxObject) {
+
+    // File Content
+    // TODO
+
+    // ACL
+    // TODO
+
+    // build item
+    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
+        .setTitle(withValue(dropBoxObject.getName()))
+        .setItemType(ItemType.CONTENT_ITEM)
+        // .setAcl(acl)
+        // .setSourceRepositoryUrl(withValue(url))
+        .setPayload(polledItem.decodePayload())
+        .setUpdateTime(withValue(new DateTime(dropBoxObject.getServerModified())));
+    if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
+      itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
+    }
+    Item item = itemBuilder.build();
+
+    RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
 
     return docBuilder.build();
   }
