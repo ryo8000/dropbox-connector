@@ -31,6 +31,7 @@ import com.google.enterprise.cloudsearch.dropbox.client.MemberClient;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.dropbox.model.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.model.DropBoxObject;
+import com.google.enterprise.cloudsearch.dropbox.util.Path;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterableImpl;
 import com.google.enterprise.cloudsearch.sdk.RepositoryException;
@@ -45,6 +46,7 @@ import com.google.enterprise.cloudsearch.sdk.indexing.template.Repository;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryDoc;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +60,8 @@ final class DropBoxRepository implements Repository {
   private static final Logger log = Logger.getLogger(DropBoxRepository.class.getName());
   /** Member's root path */
   private static final String ROOT_PATH = "";
+  /** Root URL of Dropbox */
+  private static final String ROOT_URL = "https://www.dropbox.com/home";
 
   /** {@inheritDoc} */
   private TeamClient teamClient;
@@ -114,8 +118,9 @@ final class DropBoxRepository implements Repository {
             new DropBoxObject.Builder(DropBoxObject.MEMBER, teamMemberId, memberName)
                 .build();
 
+        String url = Path.createPath(Arrays.asList(ROOT_URL, memberName));
         pushItemsBuilder.addPushItem(
-            memberName, new PushItem().encodePayload(dropBoxObject.encodePayload()));
+            url, new PushItem().encodePayload(dropBoxObject.encodePayload()));
       }
     } catch (DbxException | IOException e) {
       throw new RepositoryException.Builder()
@@ -369,8 +374,9 @@ final class DropBoxRepository implements Repository {
         continue;
       }
 
-      // TODO
-      new PushItem().encodePayload(dropBoxObject.encodePayload());
+      String url = Path.createPath(
+          Arrays.asList(ROOT_URL, memberName, dropBoxObject.getPathDisplay()));
+      items.put(url, new PushItem().encodePayload(dropBoxObject.encodePayload()));
     }
     return items;
   }
