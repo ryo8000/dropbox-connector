@@ -241,12 +241,14 @@ final class DropBoxRepository implements Repository {
         .setReaders(users)
         .build();
 
+    String url = polledItem.getName();
+
     // build item
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
         .setTitle(withValue(memberName))
         .setItemType(ItemType.CONTAINER_ITEM)
         .setAcl(acl)
-        // .setSourceRepositoryUrl(withValue(url))
+        .setSourceRepositoryUrl(withValue(url))
         .setPayload(polledItem.decodePayload());
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
       itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
@@ -274,12 +276,14 @@ final class DropBoxRepository implements Repository {
     // ACL
     // TODO
 
+    String url = polledItem.getName();
+
     // build item
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
         .setTitle(withValue(dropBoxObject.getName()))
         .setItemType(ItemType.CONTAINER_ITEM)
         // .setAcl(acl)
-        // .setSourceRepositoryUrl(withValue(url))
+        .setSourceRepositoryUrl(withValue(url))
         .setPayload(polledItem.decodePayload());
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
       itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
@@ -306,12 +310,14 @@ final class DropBoxRepository implements Repository {
     // ACL
     // TODO
 
+    String url = polledItem.getName();
+
     // build item
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
         .setTitle(withValue(dropBoxObject.getName()))
         .setItemType(ItemType.CONTENT_ITEM)
         // .setAcl(acl)
-        // .setSourceRepositoryUrl(withValue(url))
+        .setSourceRepositoryUrl(withValue(url))
         .setPayload(polledItem.decodePayload())
         .setUpdateTime(withValue(new DateTime(dropBoxObject.getServerModified())));
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
