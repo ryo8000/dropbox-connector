@@ -15,8 +15,10 @@
  */
 package com.google.enterprise.cloudsearch.dropbox.client;
 
+import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import java.util.ArrayList;
@@ -52,5 +54,9 @@ public final class MemberClient {
       result = client.files().listFolderContinue(result.getCursor());
     }
     return listFolder;
+  }
+
+  public DbxDownloader<FileMetadata> download(String path) throws DbxException {
+    return client.files().download(path);
   }
 }
