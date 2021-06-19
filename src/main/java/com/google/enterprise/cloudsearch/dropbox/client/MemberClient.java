@@ -21,8 +21,11 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.sharing.SharedFolderMembers;
+import com.google.enterprise.cloudsearch.dropbox.model.SharingInfo;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /** The client class to make remote calls to the Dropbox API user endpoints. */
 public final class MemberClient {
@@ -54,6 +57,36 @@ public final class MemberClient {
       result = client.files().listFolderContinue(result.getCursor());
     }
     return listFolder;
+  }
+
+  /**
+   * Fetch folder sharing information.
+   *
+   * @param sharedFolderId shared folder ID
+   * @return folder sharing information
+   * @throws DbxException when fetching folder sharing information from DropBox fails
+   */
+  public SharingInfo getFolderSharingInfo(String sharedFolderId) throws DbxException {
+    SharedFolderMembers sharedFolderMembers = client.sharing().listFolderMembers(sharedFolderId);
+    List<String> userIds = new ArrayList<>();
+    List<String> groupNames = new ArrayList<>();
+
+    while (true) {
+      userIds.addAll(sharedFolderMembers.getUsers().stream()
+          .map(userMember -> userMember.getUser().getTeamMemberId())
+          .collect(Collectors.toList()));
+
+      groupNames.addAll(sharedFolderMembers.getGroups().stream()
+          .map(groupMember -> groupMember.getGroup().getGroupName())
+          .collect(Collectors.toList()));
+
+      if (sharedFolderMembers.getCursor() == null) {
+        break;
+      }
+      sharedFolderMembers =
+          client.sharing().listFolderMembersContinue(sharedFolderMembers.getCursor());
+    }
+    return new SharingInfo.Builder(userIds, groupNames).build();
   }
 
   public DbxDownloader<FileMetadata> download(String path) throws DbxException {

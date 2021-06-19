@@ -31,6 +31,7 @@ import com.google.enterprise.cloudsearch.dropbox.client.MemberClient;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.dropbox.model.DropBoxConfiguration;
 import com.google.enterprise.cloudsearch.dropbox.model.DropBoxObject;
+import com.google.enterprise.cloudsearch.dropbox.model.SharingInfo;
 import com.google.enterprise.cloudsearch.dropbox.util.Path;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterable;
 import com.google.enterprise.cloudsearch.sdk.CheckpointCloseableIterableImpl;
@@ -46,6 +47,7 @@ import com.google.enterprise.cloudsearch.sdk.indexing.template.Repository;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryDoc;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /** Repository implementation for indexing content from DropBox repository. */
 final class DropBoxRepository implements Repository {
@@ -272,9 +275,27 @@ final class DropBoxRepository implements Repository {
     String memberName = dropBoxObject.getMemberDisplayName();
     String teamMemberId = dropBoxObject.getTeamMemberId();
     String folderPath = dropBoxObject.getPathDisplay();
+    String sharedFolderId = dropBoxObject.getSharedFolderId();
 
     // ACL
-    // TODO
+    List<Principal> permits = new ArrayList<>();
+    SharingInfo sharingInfo;
+    try {
+      sharingInfo = memberClient.getFolderSharingInfo(sharedFolderId);
+    } catch (DbxException e) {
+      throw new IOException(e);
+    }
+    List<Principal> users = sharingInfo.getUserIds().stream()
+        .map(Acl::getUserPrincipal)
+        .collect(Collectors.toList());
+    List<Principal> groups = sharingInfo.getGroupNames().stream()
+        .map(Acl::getGroupPrincipal)
+        .collect(Collectors.toList());
+    permits.addAll(users);
+    permits.addAll(groups);
+    Acl acl = new Acl.Builder()
+        .setReaders(permits)
+        .build();
 
     String url = polledItem.getName();
 
@@ -282,7 +303,7 @@ final class DropBoxRepository implements Repository {
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
         .setTitle(withValue(dropBoxObject.getName()))
         .setItemType(ItemType.CONTAINER_ITEM)
-        // .setAcl(acl)
+        .setAcl(acl)
         .setSourceRepositoryUrl(withValue(url))
         .setPayload(polledItem.decodePayload());
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
