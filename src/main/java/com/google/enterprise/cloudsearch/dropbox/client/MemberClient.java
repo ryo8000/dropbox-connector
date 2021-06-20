@@ -21,6 +21,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.sharing.SharedFileMembers;
 import com.dropbox.core.v2.sharing.SharedFolderMembers;
 import com.google.enterprise.cloudsearch.dropbox.model.SharingInfo;
 import java.util.ArrayList;
@@ -85,6 +86,36 @@ public final class MemberClient {
       }
       sharedFolderMembers =
           client.sharing().listFolderMembersContinue(sharedFolderMembers.getCursor());
+    }
+    return new SharingInfo.Builder(userIds, groupNames).build();
+  }
+
+  /**
+   * Fetch file sharing information.
+   *
+   * @param filePath file path
+   * @return file sharing information
+   * @throws DbxException when fetching file sharing information from DropBox fails
+   */
+  public SharingInfo getFileSharingInfo(String filePath) throws DbxException {
+    SharedFileMembers sharedFileMembers = client.sharing().listFileMembers(filePath);
+    List<String> userIds = new ArrayList<>();
+    List<String> groupNames = new ArrayList<>();
+
+    while (true) {
+      userIds.addAll(sharedFileMembers.getUsers().stream()
+          .map(userMember -> userMember.getUser().getTeamMemberId())
+          .collect(Collectors.toList()));
+
+      groupNames.addAll(sharedFileMembers.getGroups().stream()
+          .map(groupMember -> groupMember.getGroup().getGroupName())
+          .collect(Collectors.toList()));
+
+      if (sharedFileMembers.getCursor() == null) {
+        break;
+      }
+      sharedFileMembers =
+          client.sharing().listFileMembersContinue(sharedFileMembers.getCursor());
     }
     return new SharingInfo.Builder(userIds, groupNames).build();
   }

@@ -323,13 +323,32 @@ final class DropBoxRepository implements Repository {
   /**
    * Create a document to index a file.
    */
-  private ApiOperation createFileDoc(Item polledItem, DropBoxObject dropBoxObject) {
+  private ApiOperation createFileDoc(MemberClient memberClient, Item polledItem,
+      DropBoxObject dropBoxObject) throws IOException {
+    String filePath = dropBoxObject.getPathDisplay();
 
     // File Content
     // TODO
 
     // ACL
-    // TODO
+    List<Principal> permits = new ArrayList<>();
+    SharingInfo sharingInfo;
+    try {
+      sharingInfo = memberClient.getFileSharingInfo(filePath);
+    } catch (DbxException e) {
+      throw new IOException(e);
+    }
+    List<Principal> users = sharingInfo.getUserIds().stream()
+        .map(Acl::getUserPrincipal)
+        .collect(Collectors.toList());
+    List<Principal> groups = sharingInfo.getGroupNames().stream()
+        .map(Acl::getGroupPrincipal)
+        .collect(Collectors.toList());
+    permits.addAll(users);
+    permits.addAll(groups);
+    Acl acl = new Acl.Builder()
+        .setReaders(permits)
+        .build();
 
     String url = polledItem.getName();
 
@@ -337,7 +356,7 @@ final class DropBoxRepository implements Repository {
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
         .setTitle(withValue(dropBoxObject.getName()))
         .setItemType(ItemType.CONTENT_ITEM)
-        // .setAcl(acl)
+        .setAcl(acl)
         .setSourceRepositoryUrl(withValue(url))
         .setPayload(polledItem.decodePayload())
         .setUpdateTime(withValue(new DateTime(dropBoxObject.getServerModified())));
