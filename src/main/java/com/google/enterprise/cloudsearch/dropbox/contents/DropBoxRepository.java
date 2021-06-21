@@ -194,7 +194,7 @@ final class DropBoxRepository implements Repository {
         case DropBoxObject.FOLDER:
           return createFolderDoc(memberClient, item, dropBoxObject);
         case DropBoxObject.FILE:
-          return createFileDoc(item, dropBoxObject);
+          return createFileDoc(memberClient, item, dropBoxObject);
         default:
           return null;
       }
@@ -278,21 +278,13 @@ final class DropBoxRepository implements Repository {
     String sharedFolderId = dropBoxObject.getSharedFolderId();
 
     // ACL
-    List<Principal> permits = new ArrayList<>();
     SharingInfo sharingInfo;
     try {
       sharingInfo = memberClient.getFolderSharingInfo(sharedFolderId);
     } catch (DbxException e) {
       throw new IOException(e);
     }
-    List<Principal> users = sharingInfo.getUserIds().stream()
-        .map(Acl::getUserPrincipal)
-        .collect(Collectors.toList());
-    List<Principal> groups = sharingInfo.getGroupNames().stream()
-        .map(Acl::getGroupPrincipal)
-        .collect(Collectors.toList());
-    permits.addAll(users);
-    permits.addAll(groups);
+    List<Principal> permits = createSharedReaders(sharingInfo);
     Acl acl = new Acl.Builder()
         .setReaders(permits)
         .build();
@@ -331,21 +323,13 @@ final class DropBoxRepository implements Repository {
     // TODO
 
     // ACL
-    List<Principal> permits = new ArrayList<>();
     SharingInfo sharingInfo;
     try {
       sharingInfo = memberClient.getFileSharingInfo(filePath);
     } catch (DbxException e) {
       throw new IOException(e);
     }
-    List<Principal> users = sharingInfo.getUserIds().stream()
-        .map(Acl::getUserPrincipal)
-        .collect(Collectors.toList());
-    List<Principal> groups = sharingInfo.getGroupNames().stream()
-        .map(Acl::getGroupPrincipal)
-        .collect(Collectors.toList());
-    permits.addAll(users);
-    permits.addAll(groups);
+    List<Principal> permits = createSharedReaders(sharingInfo);
     Acl acl = new Acl.Builder()
         .setReaders(permits)
         .build();
@@ -368,6 +352,24 @@ final class DropBoxRepository implements Repository {
     RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
 
     return docBuilder.build();
+  }
+
+  /**
+   * Based on the sharing information, create a list of readable users and groups.
+   */
+  private List<Principal> createSharedReaders(SharingInfo sharingInfo) {
+    List<Principal> readers = new ArrayList<>();
+
+    List<Principal> users = sharingInfo.getUserIds().stream()
+        .map(Acl::getUserPrincipal)
+        .collect(Collectors.toList());
+    List<Principal> groups = sharingInfo.getGroupNames().stream()
+        .map(Acl::getGroupPrincipal)
+        .collect(Collectors.toList());
+
+    readers.addAll(users);
+    readers.addAll(groups);
+    return readers;
   }
 
   /**
