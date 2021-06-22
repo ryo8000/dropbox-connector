@@ -278,13 +278,18 @@ final class DropBoxRepository implements Repository {
     String sharedFolderId = dropBoxObject.getSharedFolderId();
 
     // ACL
-    SharingInfo sharingInfo;
-    try {
-      sharingInfo = memberClient.getFolderSharingInfo(sharedFolderId);
-    } catch (DbxException e) {
-      throw new IOException(e);
+    List<Principal> permits;
+    if (sharedFolderId.isEmpty()) {
+      permits = Collections.singletonList(Acl.getUserPrincipal(teamMemberId));
+    } else {
+      SharingInfo sharingInfo;
+      try {
+        sharingInfo = memberClient.getFolderSharingInfo(sharedFolderId);
+      } catch (DbxException e) {
+        throw new IOException(e);
+      }
+      permits = createSharedReaders(sharingInfo);
     }
-    List<Principal> permits = createSharedReaders(sharingInfo);
     Acl acl = new Acl.Builder()
         .setReaders(permits)
         .build();
