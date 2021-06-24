@@ -17,6 +17,7 @@ package com.google.enterprise.cloudsearch.dropbox.contents;
 
 import static com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder.FieldOrValue.withValue;
 
+import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
@@ -325,7 +326,13 @@ final class DropBoxRepository implements Repository {
     String filePath = dropBoxObject.getPathDisplay();
 
     // File Content
-    // TODO
+    DbxDownloader<FileMetadata> file;
+    try {
+      file = memberClient.download(filePath);
+    } catch (DbxException e) {
+      throw new IOException(e);
+    }
+
 
     // ACL
     SharingInfo sharingInfo;
