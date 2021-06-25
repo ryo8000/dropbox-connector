@@ -23,10 +23,12 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.team.TeamMemberInfo;
+import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.cloudsearch.v1.model.Item;
 import com.google.api.services.cloudsearch.v1.model.Principal;
 import com.google.api.services.cloudsearch.v1.model.PushItem;
+import com.google.common.io.ByteStreams;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.MemberClient;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
@@ -41,6 +43,7 @@ import com.google.enterprise.cloudsearch.sdk.indexing.Acl;
 import com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder;
 import com.google.enterprise.cloudsearch.sdk.indexing.StructuredData;
 import com.google.enterprise.cloudsearch.sdk.indexing.IndexingItemBuilder.ItemType;
+import com.google.enterprise.cloudsearch.sdk.indexing.IndexingService.ContentFormat;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperation;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.ApiOperations;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.PushItems;
@@ -48,6 +51,7 @@ import com.google.enterprise.cloudsearch.sdk.indexing.template.Repository;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext;
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryDoc;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -326,13 +330,17 @@ final class DropBoxRepository implements Repository {
     String filePath = dropBoxObject.getPathDisplay();
 
     // File Content
+    ByteArrayContent fileContent;
     DbxDownloader<FileMetadata> file;
     try {
       file = memberClient.download(filePath);
     } catch (DbxException e) {
       throw new IOException(e);
     }
-
+    try (InputStream contentStream = file.getInputStream()) {
+      String mimeType = file.getContentType();
+      fileContent = new ByteArrayContent(mimeType, ByteStreams.toByteArray(contentStream));
+    }
 
     // ACL
     SharingInfo sharingInfo;
@@ -361,7 +369,9 @@ final class DropBoxRepository implements Repository {
     }
     Item item = itemBuilder.build();
 
-    RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder().setItem(item);
+    RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder()
+        .setItem(item)
+        .setContent(fileContent, ContentFormat.RAW);
 
     return docBuilder.build();
   }
