@@ -330,16 +330,18 @@ final class DropBoxRepository implements Repository {
     String filePath = dropBoxObject.getPathDisplay();
 
     // File Content
-    ByteArrayContent fileContent;
-    DbxDownloader<FileMetadata> file;
-    try {
-      file = memberClient.download(filePath);
-    } catch (DbxException e) {
-      throw new IOException(e);
-    }
-    try (InputStream contentStream = file.getInputStream()) {
-      String mimeType = file.getContentType();
-      fileContent = new ByteArrayContent(mimeType, ByteStreams.toByteArray(contentStream));
+    ByteArrayContent fileContent = null;
+    if (dropBoxObject.getIsDownloadable()) {
+      DbxDownloader<FileMetadata> file;
+      try {
+        file = memberClient.download(filePath);
+      } catch (DbxException e) {
+        throw new IOException(e);
+      }
+      try (InputStream contentStream = file.getInputStream()) {
+        String mimeType = file.getContentType();
+        fileContent = new ByteArrayContent(mimeType, ByteStreams.toByteArray(contentStream));
+      }
     }
 
     // ACL
@@ -370,8 +372,11 @@ final class DropBoxRepository implements Repository {
     Item item = itemBuilder.build();
 
     RepositoryDoc.Builder docBuilder = new RepositoryDoc.Builder()
-        .setItem(item)
-        .setContent(fileContent, ContentFormat.RAW);
+        .setItem(item);
+
+    if (fileContent != null) {
+      docBuilder.setContent(fileContent, ContentFormat.RAW);
+    }
 
     return docBuilder.build();
   }
