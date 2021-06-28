@@ -66,6 +66,8 @@ import java.util.stream.Collectors;
 final class DropBoxRepository implements Repository {
   /** Log output */
   private static final Logger log = Logger.getLogger(DropBoxRepository.class.getName());
+  /** Logging message when a document is successfully created */
+  private static final String SUCCESS_LOG = "item has been processed successfully [{0}]";
   /** Member's root path */
   private static final String ROOT_PATH = "";
   /** Root URL of Dropbox */
@@ -269,7 +271,9 @@ final class DropBoxRepository implements Repository {
     Map<String, PushItem> items = getChildItems(teamMemberId, memberName, memberClient, ROOT_PATH);
     items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
 
-    return docBuilder.build();
+    RepositoryDoc document = docBuilder.build();
+    log.log(Level.INFO, SUCCESS_LOG, polledItem.getName());
+    return document;
   }
 
   /**
@@ -319,7 +323,9 @@ final class DropBoxRepository implements Repository {
     Map<String, PushItem> items = getChildItems(teamMemberId, memberName, memberClient, folderPath);
     items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
 
-    return docBuilder.build();
+    RepositoryDoc document = docBuilder.build();
+    log.log(Level.INFO, SUCCESS_LOG, polledItem.getName());
+    return document;
   }
 
   /**
@@ -378,7 +384,9 @@ final class DropBoxRepository implements Repository {
       docBuilder.setContent(fileContent, ContentFormat.RAW);
     }
 
-    return docBuilder.build();
+    RepositoryDoc document = docBuilder.build();
+    log.log(Level.INFO, SUCCESS_LOG, polledItem.getName());
+    return document;
   }
 
   /**
