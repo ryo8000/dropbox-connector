@@ -193,7 +193,6 @@ final class DropBoxRepository implements Repository {
 
     MemberClient memberClient = teamClient.asMember(dropBoxObject.getTeamMemberId());
 
-    // TODO
     try {
       switch (dropBoxObject.getObjectType()) {
         case DropBoxObject.MEMBER:
@@ -203,7 +202,10 @@ final class DropBoxRepository implements Repository {
         case DropBoxObject.FILE:
           return createFileDoc(memberClient, item, dropBoxObject);
         default:
-          return null;
+          throw new RepositoryException.Builder()
+              .setErrorMessage(String.format("Unexpected item received: [%s]", item.getName()))
+              .setErrorType(RepositoryException.ErrorType.UNKNOWN)
+              .build();
       }
     } catch (IOException e) {
       throw new RepositoryException.Builder()
