@@ -22,16 +22,19 @@ import com.google.enterprise.cloudsearch.sdk.config.Configuration;
 import java.util.Collections;
 import java.util.List;
 
+/** Object used to manage DropBox configuration. */
 public class DropBoxConfiguration {
-
+  /** Configuration key for path to the DropBox credential file */
   private static final String CREDENTIAL_FILE = "dropbox.credentialFile";
   /** Configuration key for list of team member IDs to be processed */
   private static final String TEAM_MEMBER_IDS = "dropbox.teamMemberIds";
 
+  /** Path to the DropBox credential file */
   private final String credentialFile;
   /** List of team member IDs to be processed */
   private final List<String> teamMemberIds;
 
+  /** Get an instance of {@link DropBoxConfiguration}. */
   private DropBoxConfiguration() {
     String configCredentialFile = Configuration.getString(CREDENTIAL_FILE, "").get();
     if (configCredentialFile.isEmpty()) {
@@ -42,11 +45,17 @@ public class DropBoxConfiguration {
         .getMultiValue(TEAM_MEMBER_IDS, Collections.emptyList(), Configuration.STRING_PARSER).get();
   }
 
+  /**
+   * Constructs an {@code DropBoxConfiguration} from Configuration.
+   *
+   * @return {@link DropBoxConfiguration} as per connector configuration
+   */
   public static DropBoxConfiguration fromConfiguration() {
     checkState(Configuration.isInitialized(), "configuration not initialized");
     return new DropBoxConfiguration();
   }
 
+  /** Gets path to the DropBox credential file. */
   public String getCredentialFile() {
     return credentialFile;
   }
