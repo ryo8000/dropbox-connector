@@ -24,7 +24,10 @@ import com.google.api.client.util.Key;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -144,9 +147,30 @@ public final class DropBoxObject extends GenericJson {
    * @return {@code true} if an instance of {@link DropBoxObject} is correct
    */
   public boolean isValid() {
-    return teamMemberId.startsWith(MEMBER_ID_PREFIX)
-        && SUPPORTED_TYPE.contains(objectType)
-        && !Strings.isNullOrEmpty(memberDisplayName);
+    if (!teamMemberId.startsWith(MEMBER_ID_PREFIX)
+        || !SUPPORTED_TYPE.contains(objectType)
+        || Strings.isNullOrEmpty(memberDisplayName)) {
+      return false;
+    }
+
+    if (objectType.equals(MEMBER)) {
+      return true;
+    }
+
+    List<String> required = new ArrayList<>(Arrays.asList(id, name, pathDisplay, pathLower));
+    if (objectType.equals(FILE)) {
+      if (clientModified == null || serverModified == null) {
+        return false;
+      }
+      required.addAll(Arrays.asList(contentHash, rev));
+    }
+
+    for (String value : required) {
+      if (Strings.isNullOrEmpty(value)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /** Gets dropBox object type. */
