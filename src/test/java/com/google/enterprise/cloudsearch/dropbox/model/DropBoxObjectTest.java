@@ -23,12 +23,14 @@ import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.junit.Test;
 
 public class DropBoxObjectTest {
   private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-  private static final Date NOW = new Date();
+  private static final Date NOW = now();
 
   @Test
   public void testBuilder() throws Exception {
@@ -101,6 +103,7 @@ public class DropBoxObjectTest {
     assertEquals(1234L, file1.getSize());
   }
 
+  @Test
   public void testMissingValues() {
     DropBoxObject member1 = new DropBoxObject.Builder(
         DropBoxObject.MEMBER, "dbid:ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", "my name").build();
@@ -117,7 +120,7 @@ public class DropBoxObjectTest {
     assertFalse(folder1.isValid());
 
     DropBoxObject file1 = new DropBoxObject.Builder(
-        DropBoxObject.FOLDER, "dbmid:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789", "my name")
+        DropBoxObject.FILE, "dbmid:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789", "my name")
             .setId("id:ABCDEFGHIJKLMNOPQRSTUV")
             .setName("my-file.txt")
             .setPathDisplay("/my-file.txt")
@@ -171,6 +174,18 @@ public class DropBoxObjectTest {
     assertEquals("015c27a9dc47c560000000238edda40", decoded.getRev());
     assertEquals(NOW, decoded.getServerModified());
     assertEquals(1234L, decoded.getSize());
+  }
+
+  private static Date now() {
+    String strDate = "2021-01-01";
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    Date date = null;
+    try {
+      date = dateFormat.parse(strDate);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    return date;
   }
 
   private void validateParseAndEquals(DropBoxObject object) throws IOException {
