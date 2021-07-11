@@ -431,29 +431,18 @@ final class DropBoxRepository implements Repository {
         FolderMetadata folder = (FolderMetadata) content;
         dropBoxObject =
             new DropBoxObject.Builder(DropBoxObject.FOLDER, teamMemberId, memberName)
-                .setId(folder.getId())
                 .setName(folder.getName())
                 .setPathDisplay(folder.getPathDisplay())
-                .setPathLower(folder.getPathLower())
-                .setParentSharedFolderId(folder.getParentSharedFolderId())
                 .setSharedFolderId(folder.getSharedFolderId())
                 .build();
       } else if (content instanceof FileMetadata) {
         FileMetadata file = (FileMetadata) content;
         dropBoxObject =
             new DropBoxObject.Builder(DropBoxObject.FILE, teamMemberId, memberName)
-                .setId(file.getId())
                 .setName(file.getName())
                 .setPathDisplay(file.getPathDisplay())
-                .setPathLower(file.getPathLower())
-                .setParentSharedFolderId(file.getParentSharedFolderId())
-                .setClientModified(file.getClientModified())
-                .setContentHash(file.getContentHash())
-                .setHasExplicitSharedMembers(file.getHasExplicitSharedMembers())
                 .setDownloadable(file.getIsDownloadable())
-                .setRev(file.getRev())
                 .setServerModified(file.getServerModified())
-                .setSize(file.getSize())
                 .build();
       } else {
         continue;
