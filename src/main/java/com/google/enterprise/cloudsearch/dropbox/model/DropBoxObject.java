@@ -138,12 +138,7 @@ public final class DropBoxObject extends GenericJson {
     }
 
     List<String> required = new ArrayList<>(Arrays.asList(name, pathDisplay));
-    for (String value : required) {
-      if (Strings.isNullOrEmpty(value)) {
-        return false;
-      }
-    }
-    return true;
+    return required.stream().noneMatch(Strings::isNullOrEmpty);
   }
 
   /** Gets dropBox object type. */
