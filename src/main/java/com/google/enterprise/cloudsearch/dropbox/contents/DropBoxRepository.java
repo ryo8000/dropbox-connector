@@ -128,7 +128,7 @@ final class DropBoxRepository implements Repository {
             new DropBoxObject.Builder(DropBoxObject.MEMBER, teamMemberId, memberName)
                 .build();
 
-        String url = Path.createPath(Arrays.asList(ROOT_URL, memberName));
+        String url = Path.createPath(ROOT_URL, memberName);
         pushItemsBuilder.addPushItem(
             url, new PushItem().encodePayload(dropBoxObject.encodePayload()));
       }
@@ -448,8 +448,7 @@ final class DropBoxRepository implements Repository {
         continue;
       }
 
-      String url = Path.createPath(
-          Arrays.asList(ROOT_URL, memberName, dropBoxObject.getPathDisplay()));
+      String url = Path.createPath(ROOT_URL, memberName, dropBoxObject.getPathDisplay());
       items.put(url, new PushItem().encodePayload(dropBoxObject.encodePayload()));
     }
     return items;
