@@ -1,7 +1,5 @@
 # Google Cloud Search DropBox Connector
 
-**Note:** This product is under construction. It is not yet finished.
-
 The Google Cloud Search DropBox Connector is a DropBox Connector that uses the [Google Cloud Search SDK](https://developers.google.com/cloud-search). It allows you to search data stored in DropBox using [Google Cloud Search](https://workspace.google.com/products/cloud-search/).
 
 - Using Google Cloud Search, you can search your data with high speed, high accuracy, and intuitively.
@@ -31,15 +29,15 @@ Building this connector requires the following development tools:
 
    (To skip the tests when building the connector, use `mvn package -DskipTests`)
 
-   this command creates a ZIP file containing the connector and its dependencies with a name like `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.zip`.
+   this command creates a ZIP file containing the connector and its dependencies with a name like `google-cloudsearch-dropbox-connector-1.0.0.zip`.
 
 3. Install the connector
 
    a. Copy the ZIP file to the location where you want to install the connector.
 
-   b. Unzip the connector ZIP file. A directory with a name like `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT` will be created.
+   b. Unzip the connector ZIP file. A directory with a name like `google-cloudsearch-dropbox-connector-1.0.0` will be created.
 
-   c. Change into this directory. You should see the connector jar file, `google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.jar`, as well as a `lib` directory containing the connector's dependencies.
+   c. Change into this directory. You should see the connector jar file, `google-cloudsearch-dropbox-connector-1.0.0.jar`, as well as a `lib` directory containing the connector's dependencies.
 
 4. Configure the connector
 
@@ -90,7 +88,7 @@ Building this connector requires the following development tools:
 
    ```
    java \
-      -jar google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.jar \
+      -jar google-cloudsearch-dropbox-connector-1.0.0.jar \
       --identity \
       -Dconfig=my.config
    ```
@@ -105,7 +103,7 @@ Building this connector requires the following development tools:
 
    ```
    java \
-      -jar google-cloudsearch-dropbox-connector-0.0.1-SNAPSHOT.jar \
+      -jar google-cloudsearch-dropbox-connector-1.0.0.jar \
       --dropbox \
       -Dconfig=my.config
    ```

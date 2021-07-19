@@ -4,7 +4,7 @@
 
   <groupId>com.google.enterprise.cloudsearch</groupId>
   <artifactId>google-cloudsearch-dropbox-connector</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>Google Cloud Search DropBox Connector</name>
