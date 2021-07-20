@@ -57,7 +57,7 @@ final class DropBoxIdentityRepository implements Repository {
 
   /** Injected context, provides convenience methods for building users & groups */
   private RepositoryContext repositoryContext;
-  /** {@inheritDoc} */
+  /** Team client */
   private TeamClient teamClient;
 
   DropBoxIdentityRepository() {

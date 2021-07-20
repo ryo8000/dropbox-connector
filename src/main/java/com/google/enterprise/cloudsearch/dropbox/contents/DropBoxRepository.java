@@ -73,7 +73,7 @@ final class DropBoxRepository implements Repository {
   /** Root URL of Dropbox */
   private static final String ROOT_URL = "https://www.dropbox.com/home";
 
-  /** {@inheritDoc} */
+  /** Team client */
   private TeamClient teamClient;
   /** List of team member IDs to be processed */
   private List<String> teamMemberIds;
