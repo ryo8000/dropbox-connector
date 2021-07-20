@@ -244,6 +244,7 @@ final class DropBoxRepository implements Repository {
    */
   private ApiOperation createMemberDoc(MemberClient memberClient, Item polledItem,
       DropBoxObject dropBoxObject) throws IOException {
+    String polledItemName = polledItem.getName();
     String memberName = dropBoxObject.getMemberDisplayName();
     String teamMemberId = dropBoxObject.getTeamMemberId();
 
@@ -253,14 +254,12 @@ final class DropBoxRepository implements Repository {
         .setReaders(users)
         .build();
 
-    String url = polledItem.getName();
-
     // build item
-    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
+    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItemName)
         .setTitle(withValue(memberName))
         .setItemType(ItemType.CONTAINER_ITEM)
         .setAcl(acl)
-        .setSourceRepositoryUrl(withValue(url))
+        .setSourceRepositoryUrl(withValue(polledItemName))
         .setPayload(polledItem.decodePayload());
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
       itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
@@ -274,7 +273,7 @@ final class DropBoxRepository implements Repository {
     items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
 
     RepositoryDoc document = docBuilder.build();
-    log.log(Level.INFO, SUCCESS_LOG, polledItem.getName());
+    log.log(Level.INFO, SUCCESS_LOG, polledItemName);
     return document;
   }
 
@@ -283,6 +282,7 @@ final class DropBoxRepository implements Repository {
    */
   private ApiOperation createFolderDoc(MemberClient memberClient, Item polledItem,
       DropBoxObject dropBoxObject) throws IOException {
+    String polledItemName = polledItem.getName();
     String memberName = dropBoxObject.getMemberDisplayName();
     String teamMemberId = dropBoxObject.getTeamMemberId();
     String folderPath = dropBoxObject.getPathDisplay();
@@ -305,14 +305,13 @@ final class DropBoxRepository implements Repository {
         .setReaders(permits)
         .build();
 
-    String url = polledItem.getName();
 
     // build item
-    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
+    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItemName)
         .setTitle(withValue(dropBoxObject.getName()))
         .setItemType(ItemType.CONTAINER_ITEM)
         .setAcl(acl)
-        .setSourceRepositoryUrl(withValue(url))
+        .setSourceRepositoryUrl(withValue(polledItemName))
         .setPayload(polledItem.decodePayload());
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
       itemBuilder.setObjectType(withValue(dropBoxObject.getObjectType()));
@@ -326,7 +325,7 @@ final class DropBoxRepository implements Repository {
     items.entrySet().stream().forEach(e -> docBuilder.addChildId(e.getKey(), e.getValue()));
 
     RepositoryDoc document = docBuilder.build();
-    log.log(Level.INFO, SUCCESS_LOG, polledItem.getName());
+    log.log(Level.INFO, SUCCESS_LOG, polledItemName);
     return document;
   }
 
@@ -335,6 +334,7 @@ final class DropBoxRepository implements Repository {
    */
   private ApiOperation createFileDoc(MemberClient memberClient, Item polledItem,
       DropBoxObject dropBoxObject) throws IOException {
+    String polledItemName = polledItem.getName();
     String filePath = dropBoxObject.getPathDisplay();
 
     // File Content
@@ -364,14 +364,12 @@ final class DropBoxRepository implements Repository {
         .setReaders(permits)
         .build();
 
-    String url = polledItem.getName();
-
     // build item
-    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItem.getName())
+    IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItemName)
         .setTitle(withValue(dropBoxObject.getName()))
         .setItemType(ItemType.CONTENT_ITEM)
         .setAcl(acl)
-        .setSourceRepositoryUrl(withValue(url))
+        .setSourceRepositoryUrl(withValue(polledItemName))
         .setPayload(polledItem.decodePayload())
         .setUpdateTime(withValue(new DateTime(dropBoxObject.getServerModified())));
     if (StructuredData.hasObjectDefinition(dropBoxObject.getObjectType())) {
@@ -387,7 +385,7 @@ final class DropBoxRepository implements Repository {
     }
 
     RepositoryDoc document = docBuilder.build();
-    log.log(Level.INFO, SUCCESS_LOG, polledItem.getName());
+    log.log(Level.INFO, SUCCESS_LOG, polledItemName);
     return document;
   }
 
