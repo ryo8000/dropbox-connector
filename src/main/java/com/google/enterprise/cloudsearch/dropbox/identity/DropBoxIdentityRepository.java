@@ -27,6 +27,7 @@ import com.google.api.services.cloudidentity.v1.model.Membership;
 import com.google.api.services.cloudidentity.v1.model.MembershipRole;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.TeamClient;
 import com.google.enterprise.cloudsearch.dropbox.model.DropBoxConfiguration;
@@ -37,7 +38,6 @@ import com.google.enterprise.cloudsearch.sdk.identity.IdentityUser;
 import com.google.enterprise.cloudsearch.sdk.identity.Repository;
 import com.google.enterprise.cloudsearch.sdk.identity.RepositoryContext;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -117,7 +117,7 @@ final class DropBoxIdentityRepository implements Repository {
       throw new IOException("Failed to get groups", e);
     }
 
-    List<IdentityGroup> identityGroups = new ArrayList<>();
+    List<IdentityGroup> identityGroups = Lists.newArrayList();
     for (GroupSummary group : groups) {
       identityGroups.add(convertToIdentityGroup(group));
     }

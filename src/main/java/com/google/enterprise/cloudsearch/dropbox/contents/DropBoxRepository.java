@@ -28,6 +28,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.cloudsearch.v1.model.Item;
 import com.google.api.services.cloudsearch.v1.model.Principal;
 import com.google.api.services.cloudsearch.v1.model.PushItem;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.enterprise.cloudsearch.dropbox.client.DropBoxClientFactory;
 import com.google.enterprise.cloudsearch.dropbox.client.MemberClient;
@@ -52,8 +53,6 @@ import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryContext
 import com.google.enterprise.cloudsearch.sdk.indexing.template.RepositoryDoc;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -305,7 +304,6 @@ final class DropBoxRepository implements Repository {
         .setReaders(permits)
         .build();
 
-
     // build item
     IndexingItemBuilder itemBuilder = new IndexingItemBuilder(polledItemName)
         .setTitle(withValue(dropBoxObject.getName()))
@@ -393,7 +391,7 @@ final class DropBoxRepository implements Repository {
    * Based on the sharing information, create a list of readable users and groups.
    */
   private List<Principal> createSharedReaders(SharingInfo sharingInfo) {
-    List<Principal> readers = new ArrayList<>();
+    List<Principal> readers = Lists.newArrayList();
 
     List<Principal> users = sharingInfo.getUserIds().stream()
         .map(Acl::getUserPrincipal)

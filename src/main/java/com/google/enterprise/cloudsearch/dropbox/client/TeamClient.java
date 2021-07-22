@@ -26,7 +26,7 @@ import com.dropbox.core.v2.team.GroupsMembersListResult;
 import com.dropbox.core.v2.team.MembersListResult;
 import com.dropbox.core.v2.team.TeamMemberInfo;
 import com.dropbox.core.v2.teamcommon.GroupSummary;
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
 import java.util.List;
 
 /** The client class to make remote calls to the Dropbox API team endpoints. */
@@ -59,7 +59,7 @@ public final class TeamClient {
    */
   public List<TeamMemberInfo> getMembers() throws DbxException {
     MembersListResult result = client.team().membersList();
-    List<TeamMemberInfo> members = new ArrayList<>();
+    List<TeamMemberInfo> members = Lists.newArrayList();
 
     while (true) {
       members.addAll(result.getMembers());
@@ -79,7 +79,7 @@ public final class TeamClient {
    */
   public List<GroupSummary> getGroups() throws DbxException {
     GroupsListResult result = client.team().groupsList();
-    List<GroupSummary> groups = new ArrayList<>();
+    List<GroupSummary> groups = Lists.newArrayList();
 
     while (true) {
       groups.addAll(result.getGroups());
@@ -101,7 +101,7 @@ public final class TeamClient {
   public List<GroupMemberInfo> getGroupMembers(String groupId) throws DbxException {
     GroupSelector groupSelector = GroupSelector.groupId(groupId);
     GroupsMembersListResult result = client.team().groupsMembersList(groupSelector);
-    List<GroupMemberInfo> groupMembers = new ArrayList<>();
+    List<GroupMemberInfo> groupMembers = Lists.newArrayList();
 
     while (true) {
       groupMembers.addAll(result.getMembers());

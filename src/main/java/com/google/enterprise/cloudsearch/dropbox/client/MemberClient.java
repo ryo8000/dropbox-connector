@@ -23,8 +23,8 @@ import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.sharing.SharedFileMembers;
 import com.dropbox.core.v2.sharing.SharedFolderMembers;
+import com.google.common.collect.Lists;
 import com.google.enterprise.cloudsearch.dropbox.model.SharingInfo;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +48,7 @@ public final class MemberClient {
    */
   public List<Metadata> listFolder(String path) throws DbxException {
     ListFolderResult result = client.files().listFolder(path);
-    List<Metadata> listFolder = new ArrayList<>();
+    List<Metadata> listFolder = Lists.newArrayList();
 
     while (true) {
       listFolder.addAll(result.getEntries());
@@ -69,8 +69,8 @@ public final class MemberClient {
    */
   public SharingInfo getFolderSharingInfo(String sharedFolderId) throws DbxException {
     SharedFolderMembers sharedFolderMembers = client.sharing().listFolderMembers(sharedFolderId);
-    List<String> userIds = new ArrayList<>();
-    List<String> groupNames = new ArrayList<>();
+    List<String> userIds = Lists.newArrayList();
+    List<String> groupNames = Lists.newArrayList();
 
     while (true) {
       userIds.addAll(sharedFolderMembers.getUsers().stream()
@@ -99,8 +99,8 @@ public final class MemberClient {
    */
   public SharingInfo getFileSharingInfo(String filePath) throws DbxException {
     SharedFileMembers sharedFileMembers = client.sharing().listFileMembers(filePath);
-    List<String> userIds = new ArrayList<>();
-    List<String> groupNames = new ArrayList<>();
+    List<String> userIds = Lists.newArrayList();
+    List<String> groupNames = Lists.newArrayList();
 
     while (true) {
       userIds.addAll(sharedFileMembers.getUsers().stream()

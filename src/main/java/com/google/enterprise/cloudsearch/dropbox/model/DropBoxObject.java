@@ -23,9 +23,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -137,7 +136,7 @@ public final class DropBoxObject extends GenericJson {
       return false;
     }
 
-    List<String> required = new ArrayList<>(Arrays.asList(name, pathDisplay));
+    List<String> required = Lists.newArrayList(name, pathDisplay);
     return required.stream().noneMatch(Strings::isNullOrEmpty);
   }
 
