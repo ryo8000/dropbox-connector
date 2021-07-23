@@ -43,8 +43,8 @@ public final class MemberClient {
    * Fetch files and folders in the folder.
    *
    * @param path parent folder path
-   * @return files and folders in the folder.
-   * @throws DbxException when fetching files and folders from DropBox fails.
+   * @return files and folders in the folder
+   * @throws DbxException when fetching files and folders from DropBox fails
    */
   public List<Metadata> listFolder(String path) throws DbxException {
     ListFolderResult result = client.files().listFolder(path);

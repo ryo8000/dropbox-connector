@@ -50,7 +50,7 @@ public class DropBoxClientFactory {
     try {
       credential = DbxCredential.Reader.readFromFile(credentialFile);
     } catch (JsonReader.FileLoadException e) {
-      throw new InvalidConfigurationException("Failed read credential file", e);
+      throw new InvalidConfigurationException("Failed to read credential file", e);
     }
     return credential;
   }

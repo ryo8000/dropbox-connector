@@ -23,8 +23,8 @@ public final class DropBoxIdentityConnector {
   public static void main(String[] args) throws InterruptedException {
     IdentityApplication application =
         new IdentityApplication.Builder(
-                new FullSyncIdentityConnector(new DropBoxIdentityRepository()), args)
-            .build();
+            new FullSyncIdentityConnector(new DropBoxIdentityRepository()), args)
+                .build();
     application.start();
   }
 }
