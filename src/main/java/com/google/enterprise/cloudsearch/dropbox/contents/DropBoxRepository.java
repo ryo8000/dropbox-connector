@@ -159,7 +159,10 @@ final class DropBoxRepository implements Repository {
   public CheckpointCloseableIterable<ApiOperation> getChanges(byte[] checkpoint)
       throws RepositoryException {
     // TODO
-    return null;
+    return new CheckpointCloseableIterableImpl.Builder<ApiOperation>(
+        Collections.emptyList())
+            .setHasMore(false)
+            .build();
   }
 
   /**
