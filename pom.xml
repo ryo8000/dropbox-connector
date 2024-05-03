@@ -191,12 +191,12 @@
     <dependency>
       <groupId>com.google.enterprise.cloudsearch</groupId>
       <artifactId>google-cloudsearch-indexing-connector-sdk</artifactId>
-      <version>v1-0.0.6-SNAPSHOT</version>
+      <version>v1-0.0.6</version>
     </dependency>
     <dependency>
       <groupId>com.google.enterprise.cloudsearch</groupId>
       <artifactId>google-cloudsearch-identity-connector-sdk</artifactId>
-      <version>v1-0.0.6-SNAPSHOT</version>
+      <version>v1-0.0.6</version>
     </dependency>
     <dependency>
       <groupId>com.dropbox.core</groupId>
